@@ -1,43 +1,44 @@
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../../pages/api/auth/[...nextauth]';
-import prisma from '../libs/prismadb';
+// import { getServerSession } from 'next-auth/next';
+// import prisma from '../libs/prismadb';
+// import { authOptions } from '@/auth';
 
-export async function getSession() {
-  return await getServerSession(authOptions);
-}
 
-export default async function getCurrentUser() {
-  try {
-    const session = await getSession();
-    console.log("Session:", session); 
+// export async function getSession() {
+//   return await getServerSession(authOptions);
+// }
 
-    if (!session?.user?.email) {
-      console.log("No user email in session");
-      return null;
-    }
+// export default async function getCurrentUser() {
+//   try {
+//     const session = await getSession();
+//     console.log("Session:", session); 
 
-    const currentUser = await prisma.user.findUnique({
-      where: {
-        email: session.user.email,
-      },
-    });
+//     if (!session?.user?.email) {
+//       console.log("No user email in session");
+//       return null;
+//     }
 
-    console.log("Current user from database:", currentUser); 
+//     const currentUser = await prisma.user.findUnique({
+//       where: {
+//         email: session.user.email,
+//       },
+//     });
 
-    if (!currentUser) {
-      console.log("No user found in database");
-      return null;
-    }
+//     console.log("Current user from database:", currentUser); 
 
-    return {
-      ...currentUser,
-      createdAt: currentUser.createdAt.toISOString(),
-      updatedAt: currentUser.updatedAt.toISOString(),
-      emailVerified: currentUser.emailVerified?.toISOString() || null,
-    };
+//     if (!currentUser) {
+//       console.log("No user found in database");
+//       return null;
+//     }
 
-  } catch (error) {
-    console.error("Error in getCurrentUser:", error);
-    return null;
-  }
-}
+//     return {
+//       ...currentUser,
+//       createdAt: currentUser.createdAt.toISOString(),
+//       updatedAt: currentUser.updatedAt.toISOString(),
+//       emailVerified: currentUser.emailVerified?.toISOString() || null,
+//     };
+
+//   } catch (error) {
+//     console.error("Error in getCurrentUser:", error);
+//     return null;
+//   }
+// }

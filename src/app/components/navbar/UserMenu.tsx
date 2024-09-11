@@ -1,14 +1,15 @@
 "use client"
 
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { AiOutlineMenu } from "react-icons/ai";
+import { signOut } from 'next-auth/react'
 import Avatar from "./Avatar";
-import useRegisterModal from '@/app/hooks/useRegisterModal';
-import useLoginModal from '@/app/hooks/useLoginModal';
-import useRentModal from '@/app/hooks/useRentModal';
 import MenuItem from './MenuItem';
-import {signOut} from 'next-auth/react'
-import { SafeUser } from '@/app/types';
+import { useRouter } from 'next/navigation';
+import { SafeUser } from '../../types';
+import useRegisterModal from '../../hooks/useRegisterModal';
+import useLoginModal from '../../hooks/useLoginModal';
+import useBookingModal from '../../hooks/useBookingModal';
 
 
 interface UserMenuProps {
@@ -16,50 +17,82 @@ interface UserMenuProps {
 }
 
 const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
+    const router = useRouter();
+
     const registerModal = useRegisterModal();
     const loginModal = useLoginModal();
-    const RentalModal = useRentModal();
+    const BookingModal = useBookingModal();
     const [isOpen, setIsOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     const toggleOpen = useCallback(() => {
         setIsOpen((value) => !value);
     }, []);
 
-    const onRent = useCallback(()=>{
-        if(!currentUser) {
-           return loginModal.onOpen();
+    const onRent = useCallback(() => {
+        if (!currentUser) {
+            return loginModal.onOpen();
         }
-        RentalModal.onOpen();
-    },
-     [currentUser, loginModal, RentalModal]);
+        BookingModal.onOpen();
+    }, [currentUser, loginModal, BookingModal]);
+
+    const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            toggleOpen();
+        }
+    }, [toggleOpen]);
+
+    useEffect(() => {
+        const closeMenu = (e: MouseEvent) => {
+            if (isOpen && menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('click', closeMenu);
+        return () => document.removeEventListener('click', closeMenu);
+    }, [isOpen]);
 
     return (
-        <div className="relative">
+        <div className="relative" ref={menuRef}>
             <div className="flex flex-row items-center gap-3">
                 <div 
-                    onClick={() => {}}  
+                    onClick={onRent}  
                     className="hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={handleKeyDown}
                 >
                     Unforgettable moments!
                 </div>
                 <div 
                     onClick={toggleOpen}
+                    onKeyDown={handleKeyDown}
                     className="p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition"
+                    role="button"
+                    tabIndex={0}
+                    aria-haspopup="true"
+                    aria-expanded={isOpen}
                 >
                     <AiOutlineMenu />
                     <div className="hidden md:block">
-                        <Avatar src = {currentUser?.image} />
+                        <Avatar src={currentUser?.image} />
                     </div>
                 </div>
             </div>
             {isOpen && (
-                <div className="absolute rounded-xl shadow-md w-[40vw] md:w-3/4 bg-white overflow-hidden right-0 top-12 text-sm">
+                <div 
+                    className="absolute rounded-xl shadow-md w-[40vw] md:w-3/4 bg-white overflow-hidden right-0 top-12 text-sm"
+                    role="menu"
+                >
                     <div className="flex flex-col cursor-pointer">
                         {currentUser ? (
                             <>
-                                <MenuItem onClick={() => {}} label="My activities" />
-                                <MenuItem onClick={() => {}} label="My favorites" />
-                                <MenuItem onClick={() => {}} label="My bookings" />
+                                <MenuItem onClick={() => router.push('/activities')} label="My activities" />
+                                <MenuItem onClick={() => router.push('/favorites')} label="My favorites" />
+                                <MenuItem onClick={() => router.push('/bookings')}label="My bookings" />
+                                <MenuItem onClick={() => router.push('/proposals')}label="My my proposals" />
+                                <MenuItem onClick={BookingModal.onOpen} label="Unforgotable Moments!" />
                                 <hr />
                                 <MenuItem onClick={() => signOut()} label="Logout" />
                             </>
@@ -76,4 +109,4 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
     );
 };
 
-export default UserMenu;
+export default React.memo(UserMenu);

@@ -5,9 +5,12 @@ import Navbar from "./components/navbar/Navbar";
 import ClientOnly from "./components/navbar/ClientOnly";
 import RegisterModal from "./components/modals/RegisterModal";
 import LoginModal from "./components/modals/LoginModal";
-import RentalModal from "./components/modals/RentalModal";
 import ToasterProvider from "./providers/ToasterProvider";
-import getCurrentUser from "./actions/getCurrentUser";
+// import getCurrentUser from "./actions/getCurrentUser";
+import BookingModal from "./components/modals/BookingModal";
+import SearchModal from "./components/modals/SearchModal";
+import { SessionProvider } from "next-auth/react";
+import {auth} from "@/src/auth"
 
 const font = Nunito({
   subsets: ["latin"],
@@ -23,20 +26,27 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const currentUser = await getCurrentUser();
+  // const currentUser = await getCurrentUser();
+  const session = await auth();
 
   return (
+    <SessionProvider>
     <html lang="en">
       <body className={font.className}>
         <ClientOnly>
           <ToasterProvider />
           <RegisterModal />
           <LoginModal />
-          <RentalModal />
-          <Navbar currentUser={currentUser} />
+          <BookingModal />
+          <SearchModal />
+          <Navbar />
         </ClientOnly>
-        {children}
+        <div className="pb-20 pt-28">{children}
+
+        </div>
+        
       </body>
     </html>
+    </SessionProvider>
   );
 }

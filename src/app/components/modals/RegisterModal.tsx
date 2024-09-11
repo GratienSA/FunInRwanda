@@ -1,19 +1,20 @@
 "use client"
 
-import axios from "axios"
 import { FcGoogle } from "react-icons/fc"
 import { useCallback, useState } from "react"
-import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from "react-hot-toast"
 import { signIn } from 'next-auth/react'
+import { zodResolver } from "@hookform/resolvers/zod"
+import { RegisterSchema, RegisterFormValues } from "../../schemas"
+import { register } from "../../actions/register" 
 
-import useRegisterModal from "@/app/hooks/useRegisterModal"
-import useLoginModal from "@/app/hooks/useLoginModal"
 import Modal from "./Modal"
 import Heading from "../Heading"
 import Input from "../inputs/Input"
 import Button from "../navbar/Button"
-
+import useRegisterModal from "../../hooks/useRegisterModal"
+import useLoginModal from "../../hooks/useLoginModal"
 
 const RegisterModal = () => {
     const registerModal = useRegisterModal();
@@ -21,34 +22,39 @@ const RegisterModal = () => {
     const [isLoading, setIsLoading] = useState(false);
     
     const { 
-        register, 
+        register: registerField, 
         handleSubmit, 
-        formState: { 
-            errors 
-        } 
-    } = useForm<FieldValues>({
+        formState: { errors } 
+    } = useForm<RegisterFormValues>({
+        resolver: zodResolver(RegisterSchema),
         defaultValues: {
-            name: "",
             email: "",
             password: ""
         }
     });
 
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    const onSubmit: SubmitHandler<RegisterFormValues> = async (data) => {
         setIsLoading(true);
 
-        axios.post("/api/register", data)
-            .then(() => {
+        try {
+            const result = await register(data);
+            
+            if (result.success) {
                 toast.success('Registered successfully');
                 registerModal.onClose();
                 loginModal.onOpen();
-            })
-            .catch((error) => {
-                toast.error(error.response?.data?.error || 'Something went wrong');
-            })
-            .finally(() => {   
-                setIsLoading(false);
-            });
+            } else {
+                toast.error(result.error || 'Something went wrong');
+                if (result.issues) {
+                    console.error('Validation issues:', result.issues);
+                }
+            }
+        } catch (error) {
+            toast.error('An error occurred during registration');
+            console.error('Registration error:', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const toggle = useCallback(() => {
@@ -63,19 +69,11 @@ const RegisterModal = () => {
                 subtitle="Create an account!"
             />
             <Input
-                id="name"
-                label="Name"
-                disabled={isLoading}
-                register={register}
-                errors={errors}
-                required
-            />
-            <Input
                 id="email"
                 label="Email"
                 type="email"
                 disabled={isLoading}
-                register={register}
+                register={registerField}
                 errors={errors}
                 required
             />
@@ -84,7 +82,7 @@ const RegisterModal = () => {
                 label="Password"
                 type="password"
                 disabled={isLoading}
-                register={register}
+                register={registerField}
                 errors={errors}
                 required
             />

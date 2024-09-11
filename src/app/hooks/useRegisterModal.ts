@@ -1,5 +1,3 @@
-import { userAgent } from "next/server";
-import { use } from "react";
 import { create } from "zustand";
 
 interface RegisterModalStore {

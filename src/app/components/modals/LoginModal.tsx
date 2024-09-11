@@ -1,21 +1,25 @@
-"use client"
+"use client";
 
-import { signIn } from "next-auth/react"
-import { FcGoogle } from "react-icons/fc"
-import { useCallback, useState } from "react"
-import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
-import { toast } from "react-hot-toast"
-import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react";
+import { FcGoogle } from "react-icons/fc";
+import { useCallback, useState } from "react";
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LoginSchema } from "../../schemas";
+import { login } from "../../actions/login";
+import { z } from "zod";
 
-import useRegisterModal from "@/app/hooks/useRegisterModal"
-import useLoginModal from "@/app/hooks/useLoginModal"
-import Modal from "./Modal"
-import Heading from "../Heading"
-import Input from "../inputs/Input"
-import Button from "../navbar/Button"
+import Modal from "./Modal";
+import Heading from "../Heading";
+import Input from "../inputs/Input";
+import Button from "../navbar/Button";
+import useRegisterModal from "../../hooks/useRegisterModal";
+import useLoginModal from "../../hooks/useLoginModal";
 
 const LoginModal = () => {
-    const router = useRouter()
+    const router = useRouter();
     const registerModal = useRegisterModal();
     const loginModal = useLoginModal();
     const [isLoading, setIsLoading] = useState(false);
@@ -23,38 +27,45 @@ const LoginModal = () => {
     const { 
         register, 
         handleSubmit, 
-        formState: { 
-            errors 
-        } 
-    } = useForm<FieldValues>({
+        formState: { errors } 
+    } = useForm<z.infer<typeof LoginSchema>>({
+        resolver: zodResolver(LoginSchema),
         defaultValues: {
             email: "",
             password: ""
         }
     });
 
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
+    const onSubmit: SubmitHandler<z.infer<typeof LoginSchema>> = async (data) => {
         setIsLoading(true);
-        signIn("credentials", {
-            ...data,
-            redirect: false
-        })
-        .then((callback) => {
-            setIsLoading(false)
+        
+        try {
+            // Appel de la fonction login du serveur
+            const result = await login(data);
+            
+            if (result.success) {
+                // Si la connexion réussit côté serveur, procédez à la connexion côté client
+                const signInResult = await signIn("credentials", {
+                    ...data,
+                    redirect: false
+                });
 
-            if (callback?.ok) {
-                toast.success("Logged in successfully");
-                router.refresh();
-                loginModal.onClose();
-            } else if (callback?.error) {
-                toast.error(callback.error);
+                if (signInResult?.ok) {
+                    toast.success("Logged in successfully");
+                    router.refresh();
+                    loginModal.onClose();
+                } else {
+                    toast.error("Failed to sign in");
+                }
             } else {
-                toast.error("Something went wrong");
+                // Si la validation échoue côté serveur
+                toast.error(result.error || "Invalid credentials");
             }
-        })
-        .catch(() => {
+        } catch (error) {
             toast.error("An error occurred");
-        });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const toggle = useCallback(() => {
