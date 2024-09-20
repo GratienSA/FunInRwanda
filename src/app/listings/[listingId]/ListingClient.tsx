@@ -6,14 +6,13 @@ import axios from 'axios';
 import { differenceInCalendarDays, eachDayOfInterval } from 'date-fns';
 import { toast } from 'react-hot-toast';
 import { Range } from 'react-date-range';
-
-import Container from '@/app/components/Container';
-import ListingHead from '@/app/components/listings/ListingHead';
-import ListingInfo from '@/app/components/listings/ListingInfo';
-import ListingBooking from '@/app/components/listings/ListingBooking';
-import { categories } from '@/app/components/navbar/Categories';
-import useLoginModal from '@/app/hooks/useLoginModal';
-import { SafeBooking, SafeListing, SafeUser } from '@/app/types';
+import { SafeBooking, SafeListing, SafeUser } from '../../../types';
+import useLoginModal from '../../../hooks/useLoginModal';
+import { categories } from '../../../components/navbar/Categories';
+import Container from '../../../components/Container';
+import ListingInfo from '../../../components/listings/ListingInfo';
+import ListingBooking from '../../../components/listings/ListingBooking';
+import ListingHead from "../../../components/listings/ListingHead";
 
 const initialDateRange = {
     startDate: new Date(),
@@ -54,30 +53,31 @@ const ListingClient: React.FC<ListingClientProps> = ({
     const [totalPrice, setTotalPrice] = useState(listing.price);
     const [dateRange, setDateRange] = useState<Range>(initialDateRange);
 
-    const onCreateBooking = useCallback(() => {
+    const onCreateBooking = useCallback(async () => {
         if (!currentUser) {
             return loginModal.onOpen();
         }
         setIsLoading(true);
 
-        axios
-            .post('/api/bookings', {
+        try {
+            await axios.post('/api/bookings', {
                 totalPrice,
                 startDate: dateRange.startDate,
                 endDate: dateRange.endDate,
                 listingId: listing.id,
-            })
-            .then(() => {
-                toast.success('Activity reserved!');
-                setDateRange(initialDateRange);
-                router.push('/trips');
-            })
-            .catch(() => {
-                toast.error('Something went wrong.');
-            })
-            .finally(() => {
-                setIsLoading(false);
             });
+            toast.success('Activity reserved!');
+            setDateRange(initialDateRange);
+            router.push('/trips');
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data?.error || 'Something went wrong.');
+            } else {
+                toast.error('An unexpected error occurred.');
+            }
+        } finally {
+            setIsLoading(false);
+        }
     }, [totalPrice, dateRange, listing?.id, router, currentUser, loginModal]);
 
     useEffect(() => {

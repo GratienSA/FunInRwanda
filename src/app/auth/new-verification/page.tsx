@@ -1,11 +1,7 @@
-import { NewVerificationForm } from "../../components/auth/NewVerificationForm "
-
-
+import { NewVerificationForm } from "@/src/components/auth/NewVerificationForm ";
 
 const NewVerificationPage = () => {
-  return (
-    <NewVerificationForm />
-  )
-}
+  return <NewVerificationForm />;
+};
 
-export default NewVerificationPage
+export default NewVerificationPage;

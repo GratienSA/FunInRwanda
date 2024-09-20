@@ -1,6 +1,6 @@
-import getCurrentUser from "@/app/actions/getCurrentUser";
+import prismadb from "@/src/lib/prismadb";
 import { NextResponse } from "next/server";
-import prisma from "@/app/libs/prismadb";
+import { currentUser } from "@/src/lib/auth"; 
 
 interface IParams {
   listingId?: string;
@@ -11,28 +11,34 @@ export async function DELETE(
   { params }: { params: IParams }
 ) {
   try {
-    const currentUser = await getCurrentUser();
+    
+    const user = await currentUser(); 
 
-    if (!currentUser) {
-      return NextResponse.error();
+    if (!user) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
     }
 
     const { listingId } = params;
 
     if (!listingId || typeof listingId !== 'string') {
-      throw new Error('Invalid ID');
+      return NextResponse.json({ message: 'Invalid ID' }, { status: 400 });
     }
 
-    const listing = await prisma.listing.deleteMany({
+    const listing = await prismadb.listing.deleteMany({
       where: {
         id: listingId,
-        userId: currentUser.id
+        userId: user.id
       }
     });
 
-    return NextResponse.json(listing);
+    
+    if (listing.count === 0) {
+      return NextResponse.json({ message: 'Listing not found or unauthorized' }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: 'Listing deleted successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error:', error);
-    return NextResponse.error();
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }

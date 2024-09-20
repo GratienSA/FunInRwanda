@@ -1,12 +1,33 @@
-import EmptyState from "../components/EmptyState";
-import ClientOnly from "../components/navbar/ClientOnly";
+"use client";
 
-import getCurrentUser from "../actions/getCurrentUser";
-import getReservations from "../actions/getBookings";
+import { useEffect, useState } from "react";
+import EmptyState from "../../components/EmptyState";
+import ClientOnly from "../../components/navbar/ClientOnly";
+import getReservations from "../../actions/getBookings";
 import ActivitiesClient from "./ActivitiesClient";
+import { useCurrentUser } from "@/src/hooks/useCurrentUser";
+import { SafeBooking } from "../../types";
 
-const ActivitiesPage = async () => {
-  const currentUser = await getCurrentUser();
+const ActivitiesPage = () => {
+  const currentUser = useCurrentUser();
+  const [bookings, setBookings] = useState<SafeBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (currentUser) {
+        const fetchedBookings = await getReservations({ userId: currentUser.id });
+        setBookings(fetchedBookings);
+      }
+      setLoading(false);
+    };
+
+    fetchBookings();
+  }, [currentUser]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (!currentUser) {
     return (
@@ -18,10 +39,6 @@ const ActivitiesPage = async () => {
       </ClientOnly>
     );
   }
-
-  const bookings = await getReservations({
-    userId: currentUser.id
-  });
 
   if (bookings.length === 0) {
     return (
@@ -45,5 +62,3 @@ const ActivitiesPage = async () => {
 };
 
 export default ActivitiesPage;
-
-

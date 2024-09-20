@@ -1,13 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { SafeListing, SafeUser } from "../types";
+import { SafeListing, SafeUser } from "../../types";
 import { useCallback, useState } from "react";
 import axios from "axios";
 import { toast } from 'react-hot-toast';
-import Container from "../components/Container";
-import Heading from "../components/Heading";
-import ListingCard from "../components/listings/ListingCard";
+import Container from "../../components/Container";
+import Heading from "../../components/Heading";
+import ListingCard from "../../components/listings/ListingCard";
 
 interface ProposalsClientProps {
   listings: SafeListing[];
@@ -21,20 +21,21 @@ const ProposalsClient: React.FC<ProposalsClientProps> = ({
   const router = useRouter();
   const [deletingId, setDeletingId] = useState('');
 
-  const onCancel = useCallback((id: string) => {
-    setDeletingId(id);
-
-    axios.delete(`/api/listings/${id}`)
-      .then(() => {
-        toast.success('Listing cancelled');
-        router.refresh();
-      })
-      .catch((error) => {
-        toast.error(error?.response?.data?.error || 'Something went wrong');
-      })
-      .finally(() => {
-        setDeletingId('');
-      });
+  const onCancel = useCallback(async (id: string) => {
+    try {
+      setDeletingId(id);
+      await axios.delete(`/api/listings/${id}`);
+      toast.success('Listing cancelled');
+      router.refresh();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.error || 'Something went wrong');
+      } else {
+        toast.error('An unexpected error occurred');
+      }
+    } finally {
+      setDeletingId('');
+    }
   }, [router]);
 
   return (
@@ -45,7 +46,7 @@ const ProposalsClient: React.FC<ProposalsClientProps> = ({
       />
       <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8">
         {listings.length === 0 ? (
-          <div className="text-center text-neutral-500">No proposals found.</div>
+          <div className="col-span-full text-center text-neutral-500">No proposals found.</div>
         ) : (
           listings.map((listing) => (
             <ListingCard

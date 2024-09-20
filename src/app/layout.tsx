@@ -1,52 +1,46 @@
-import type { Metadata } from "next";
+"use client";
+
+import { SessionProvider } from "next-auth/react";
 import { Nunito } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/navbar/Navbar";
-import ClientOnly from "./components/navbar/ClientOnly";
-import RegisterModal from "./components/modals/RegisterModal";
-import LoginModal from "./components/modals/LoginModal";
+import Navbar from "../components/navbar/Navbar";
+import LoginModal from "../components/modals/LoginModal";
+import RegisterModal from "../components/modals/RegisterModal";
 import ToasterProvider from "./providers/ToasterProvider";
-// import getCurrentUser from "./actions/getCurrentUser";
-import BookingModal from "./components/modals/BookingModal";
-import SearchModal from "./components/modals/SearchModal";
-import { SessionProvider } from "next-auth/react";
-import {auth} from "@/src/auth"
+import SearchModal from "../components/modals/SearchModal";
+import ClientOnly from "../components/navbar/ClientOnly";
+import BookingModal from "../components/modals/BookingModal";
+import { ClientProviders } from "./ClientProviders";
 
-const font = Nunito({
+
+const font = Nunito({ 
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "FunInRwanda",
-  description: "Discover thrilling activities and unforgettable experiences across Rwanda, tailored just for you!",
-};
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  // const currentUser = await getCurrentUser();
-  const session = await auth();
-
+}) {
   return (
-    <SessionProvider>
     <html lang="en">
       <body className={font.className}>
-        <ClientOnly>
-          <ToasterProvider />
-          <RegisterModal />
-          <LoginModal />
-          <BookingModal />
-          <SearchModal />
-          <Navbar />
-        </ClientOnly>
-        <div className="pb-20 pt-28">{children}
-
-        </div>
-        
+        <SessionProvider>
+          <ClientProviders>
+            <ClientOnly>
+              <ToasterProvider/>
+              <SearchModal/>
+              <BookingModal/>
+              <LoginModal />
+              <RegisterModal />
+              <Navbar />
+            </ClientOnly>
+            <div className="pb-20 pt-28">
+              {children}
+            </div>
+          </ClientProviders>
+        </SessionProvider>
       </body>
     </html>
-    </SessionProvider>
   );
 }

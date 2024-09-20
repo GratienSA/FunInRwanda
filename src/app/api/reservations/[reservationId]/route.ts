@@ -1,6 +1,6 @@
+import { currentUser } from "@/src/lib/auth";
+import prismadb from "@/src/lib/prismadb";
 import { NextResponse } from "next/server";
-import prisma from "@/app/libs/prismadb";
-import getCurrentUser from "@/app/actions/getCurrentUser";
 
 interface IParams {
     reservationId?: string;
@@ -10,30 +10,30 @@ export async function DELETE(
     request: Request,
     { params }: { params: IParams }
 ) {
-    const currentUser = await getCurrentUser();
+    const user = await currentUser();
 
-    if (!currentUser) {
-        return NextResponse.error();
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { reservationId } = params;
 
     if (!reservationId || typeof reservationId !== 'string') {
-        throw new Error('Invalid reservation ID');
+        return NextResponse.json({ error: "Invalid reservation ID" }, { status: 400 });
     }
 
     try {
-        const reservation = await prisma.booking.deleteMany({
+        const result = await prismadb.booking.deleteMany({
             where: {
                 id: reservationId,
                 OR: [
-                    { userId: currentUser.id },
-                    { listing: { userId: currentUser.id } }
+                    { userId: user.id },
+                    { listing: { userId: user.id } }
                 ]
             }
         });
 
-        if (reservation.count === 0) {
+        if (result.count === 0) {
             return NextResponse.json({ error: "Reservation not found or you don't have permission to delete it" }, { status: 404 });
         }
 

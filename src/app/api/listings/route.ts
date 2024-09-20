@@ -1,14 +1,14 @@
-import getCurrentUser from "@/app/actions/getCurrentUser";
 import { NextResponse } from "next/server";
-import prisma from "@/app/libs/prismadb";
+import { currentUser } from "@/src/lib/auth";
+import prismadb from "@/src/lib/prismadb";
 
 export async function POST(
     request: Request,
 ) {
-    const currentUser = await getCurrentUser();
+    const user = await currentUser();
 
-    if (!currentUser) {
-        return NextResponse.error();
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -34,21 +34,22 @@ export async function POST(
         cancellationPolicy,
     } = body;
 
-    
+    // Liste des champs requis
     const requiredFields = [
         'title', 'description', 'imageSrc', 'category', 'activityType',
         'duration', 'difficulty', 'minParticipants', 'maxParticipants',
         'locationName', 'locationAddress', 'latitude', 'longitude', 'price'
     ];
 
+    // Validation des champs requis
     for (const field of requiredFields) {
-        if (!body[field]) {
+        if (body[field] === undefined || body[field] === null) {
             return NextResponse.json({ error: `${field} is required` }, { status: 400 });
         }
     }
 
     try {
-        const listing = await prisma.listing.create({
+        const listing = await prismadb.listing.create({
             data: {
                 title,
                 description,
@@ -69,7 +70,7 @@ export async function POST(
                 currency: currency || "EUR",
                 isInstantBook: isInstantBook || false,
                 cancellationPolicy,
-                userId: currentUser.id
+                userId: user.id
             }
         });
 

@@ -6,9 +6,9 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import Button from "../../components/navbar/Button";
-import Input from "../../components/inputs/Input";
-import Heading from "../../components/Heading";
+import Button from "../../../components/navbar/Button";
+import Input from "../../../components/inputs/Input";
+import Heading from "../../../components/Heading";
 
 
 // Define a schema for password reset

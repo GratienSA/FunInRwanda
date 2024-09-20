@@ -1,42 +1,59 @@
-import getCurrentUser from "../actions/getCurrentUser"
-import getFavoriteListings from "../actions/getFavoriteListings"
-import EmptyState from "../components/EmptyState"
-import ClientOnly from "../components/navbar/ClientOnly"
-import FavoritesClient from "./FavoritesClient"
-import { SafeListing, SafeUser } from "../types" 
+"use client";
 
+import { useEffect, useState } from "react";
+import EmptyState from "../../components/EmptyState";
+import ClientOnly from "../../components/navbar/ClientOnly";
+import FavoritesClient from "./FavoritesClient";
+import { SafeListing } from "../../types";
+import { getFavoriteListings } from "../../actions/getFavoriteListings";
+import { useCurrentUser } from "@/src/hooks/useCurrentUser";
 
 const convertToSafeListing = (listing: any): SafeListing => ({
   ...listing,
-  createdAt: listing.createdAt.toISOString(),
-  updatedAt: listing.updatedAt.toISOString(),
+  createdAt: new Date(listing.createdAt).toISOString(),
+  updatedAt: new Date(listing.updatedAt).toISOString(),
   user: {
-    
     ...listing.user,
-    createdAt: listing.user.createdAt.toISOString(),
-    updatedAt: listing.user.updatedAt.toISOString(),
-    emailVerified: listing.user.emailVerified?.toISOString() || null,
+    createdAt: new Date(listing.user.createdAt).toISOString(),
+    updatedAt: new Date(listing.user.updatedAt).toISOString(),
+    emailVerified: listing.user.emailVerified ? new Date(listing.user.emailVerified).toISOString() : null,
   },
   bookings: [], 
   reviews: [], 
-})
+});
 
-const convertToSafeUser = (user: any): SafeUser | null => {
-  if (!user) return null;
-  return {
-    ...user,
-    createdAt: user.createdAt.toISOString(),
-    updatedAt: user.updatedAt.toISOString(),
-    emailVerified: user.emailVerified?.toISOString() || null,
-  }
-}
+const FavoritesPage = () => {
+    const currentUser = useCurrentUser();
+    const [listings, setListings] = useState<SafeListing[]>([]);
+    const [loading, setLoading] = useState(true);
 
-const ListingPage = async () => {
-    const rawListings = await getFavoriteListings()
-    const currentUserRaw = await getCurrentUser()
+    useEffect(() => {
+        const fetchFavorites = async () => {
+            if (currentUser) {
+                const rawListings = await getFavoriteListings(currentUser.id);
+                const safeListings = rawListings.map(convertToSafeListing);
+                setListings(safeListings);
+            }
+            setLoading(false);
+        };
 
-    const listings: SafeListing[] = rawListings.map(convertToSafeListing)
-    const currentUser = convertToSafeUser(currentUserRaw)
+        fetchFavorites();
+    }, [currentUser]);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (!currentUser) {
+        return (
+            <ClientOnly>
+                <EmptyState
+                    title="Unauthorized"
+                    subtitle="Please login to view your favorites"
+                />
+            </ClientOnly>
+        );
+    }
 
     if (listings.length === 0) {
         return (
@@ -46,7 +63,7 @@ const ListingPage = async () => {
                     subtitle="Looks like you have no favorite listings."
                 />
             </ClientOnly>
-        )
+        );
     } 
     
     return (
@@ -56,7 +73,7 @@ const ListingPage = async () => {
                 currentUser={currentUser}
             />
         </ClientOnly>
-    )
+    );
 }
 
-export default ListingPage
+export default FavoritesPage;

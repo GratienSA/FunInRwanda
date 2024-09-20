@@ -1,14 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-
 import { useCallback, useState } from "react";
 import axios from "axios";
 import { toast } from 'react-hot-toast';
-import Container from "../components/Container";
-import Heading from "../components/Heading";
-import ListingCard from "../components/listings/ListingCard";
-import { SafeBooking, SafeUser } from "../types";
+import Container from "../../components/Container";
+import Heading from "../../components/Heading";
+import ListingCard from "../../components/listings/ListingCard";
+import { SafeBooking, SafeUser } from "../../types";
 
 interface ActivitiesClientProps {
   bookings: SafeBooking[];
@@ -66,4 +65,4 @@ const ActivitiesClient: React.FC<ActivitiesClientProps> = ({
   )
 }
 
-export default ActivitiesClient
+export default ActivitiesClient;

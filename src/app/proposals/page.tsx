@@ -1,12 +1,33 @@
-import EmptyState from "../components/EmptyState";
-import ClientOnly from "../components/navbar/ClientOnly";
+"use client";
+
+import { useEffect, useState } from "react";
+import EmptyState from "../../components/EmptyState";
+import ClientOnly from "../../components/navbar/ClientOnly";
 import ProposalsClient from "./ProposalsClient";
+import getListings from "../../actions/getListings";
+import { useCurrentUser } from "@/src/hooks/useCurrentUser";
+import { SafeListing } from "../../types";
 
-import getCurrentUser from "../actions/getCurrentUser";
-import getListings from "../actions/getListings";
+const ProposalsPage = () => {
+  const currentUser = useCurrentUser();
+  const [listings, setListings] = useState<SafeListing[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const ProposalsPage = async () => {
-  const currentUser = await getCurrentUser();
+  useEffect(() => {
+    const fetchListings = async () => {
+      if (currentUser) {
+        const fetchedListings = await getListings({ userId: currentUser.id });
+        setListings(fetchedListings);
+      }
+      setLoading(false);
+    };
+
+    fetchListings();
+  }, [currentUser]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (!currentUser) {
     return (
@@ -18,10 +39,6 @@ const ProposalsPage = async () => {
       </ClientOnly>
     );
   }
-
-  const listings = await getListings({
-    userId: currentUser.id
-  });
 
   if (listings.length === 0) {
     return (
@@ -45,6 +62,3 @@ const ProposalsPage = async () => {
 };
 
 export default ProposalsPage;
-
-
-
