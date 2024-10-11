@@ -1,4 +1,5 @@
 import NextAuth, { NextAuthConfig } from "next-auth";
+import type { NextAuthOptions } from "next-auth"
 import { UserRole } from "@prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { getUserById } from "./src/data/user";
@@ -7,11 +8,18 @@ import { getTwoFactorConfirmationByUserId } from "./src/data/two-factor-confirma
 import { getAccountByUserId } from "./src/data/account";
 import authConfig from "./auth.config";
 
+
+interface ExtendedNextAuthConfig extends NextAuthConfig {
+  csrf?: {
+    checkOrigin: boolean;
+  };
+}
+
 if (!process.env.NEXTAUTH_SECRET || !process.env.DATABASE_URL) {
   throw new Error("NEXTAUTH_SECRET or DATABASE_URL is not defined");
 }
 
-export const authOptions: NextAuthConfig = {
+export const authOptions: ExtendedNextAuthConfig & NextAuthOptions = {
   pages: {
     signIn: "/auth/login",
     error: "/auth/error",
@@ -110,6 +118,11 @@ export const authOptions: NextAuthConfig = {
   adapter: PrismaAdapter(prismadb),
   session: { strategy: "jwt" },
   ...authConfig,
+
+  csrf: {
+    checkOrigin: false,
+  } ,
+
 };
 
 export const { auth, signIn, signOut, handlers: { GET, POST } } = NextAuth(authOptions);

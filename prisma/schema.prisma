@@ -29,6 +29,7 @@ model User {
   listings        Listing[]
   reviews         Review[]
   bookings        Booking[]
+  favorites       Favorite[]
   isTwoFactorEnabled Boolean @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
 }
@@ -98,7 +99,7 @@ model Listing {
   difficulty         String
   minParticipants    Int
   maxParticipants    Int
-  ageRestriction     String?
+  ageRestriction     Int?
   equipment          String[]
   locationName       String
   locationAddress    String
@@ -110,11 +111,17 @@ model Listing {
   cancellationPolicy String
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+  viewCount          Int      @default(0) 
+  bookingCount       Int      @default(0) 
+  reviewCount        Int      @default(0) 
+  reviewAverage      Float    @default(0.0) 
   userId             String   @db.ObjectId
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   bookings Booking[]
-  reviews  Review[]
+  reviews  Review[] 
+
+  Favorite Favorite[]
 }
 
 model Booking {
@@ -126,11 +133,11 @@ model Booking {
   totalPrice Float
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  status     String   @default("pending") // Ajoutez cette ligne
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }
-
 model Review {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   rating    Int
@@ -143,3 +150,16 @@ model Review {
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }
+
+model Favorite {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  listingId String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+}
+

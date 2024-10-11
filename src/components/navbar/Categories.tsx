@@ -18,7 +18,7 @@ export const categories = [
         description: "Perfect gift ideas"
     },
     {
-        label: 'Children',
+        label: 'Child birthday',
         icon: FaBirthdayCake,
         description: "Celebrations and activities for kids"
     },
@@ -58,6 +58,7 @@ const Categories = () => {
                 ))}
             </div>
         </Container>
+        
     )
 }
 

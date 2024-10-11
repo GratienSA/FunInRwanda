@@ -1,6 +1,6 @@
 "use client"
 
-import { Range, DateRange, RangeKeyDict } from "react-date-range";
+import { DateRange as LibDateRange, RangeKeyDict, Range } from "react-date-range";
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import { fr } from 'date-fns/locale';
@@ -17,11 +17,20 @@ const Calendar: React.FC<CalendarProps> = ({
     disabledDates
 }) => {
     return (
-        <DateRange
+        <LibDateRange
             rangeColors={["#262626"]}
             ranges={[value]}
             date={new Date()}
-            onChange={(item: RangeKeyDict) => onChange(item.selection)}
+            onChange={(item: RangeKeyDict) => {
+                const selection = item[value.key || 'selection'];
+                if (selection.startDate && selection.endDate) {
+                    onChange({
+                        startDate: selection.startDate,
+                        endDate: selection.endDate,
+                        key: value.key || 'selection'
+                    });
+                }
+            }}
             direction="vertical"
             showDateDisplay={false}
             minDate={new Date()}

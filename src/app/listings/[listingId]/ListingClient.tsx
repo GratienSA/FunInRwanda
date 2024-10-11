@@ -32,20 +32,23 @@ const ListingClient: React.FC<ListingClientProps> = ({
     currentUser,
 }) => {
     const loginModal = useLoginModal();
-    const router = useRouter();
+    const router = useRouter(); 
 
     const disabledDates = useMemo(() => {
         let dates: Date[] = [];
-
-        bookings.forEach((booking) => {
-            const range = eachDayOfInterval({
-                start: new Date(booking.startDate),
-                end: new Date(booking.endDate),
+    
+        if (Array.isArray(bookings)) {
+            bookings.forEach((booking) => {
+                if (booking.startDate && booking.endDate) {
+                    const range = eachDayOfInterval({
+                        start: new Date(booking.startDate),
+                        end: new Date(booking.endDate),
+                    });
+                    dates = [...dates, ...range];
+                }
             });
-
-            dates = [...dates, ...range];
-        });
-
+        }
+    
         return dates;
     }, [bookings]);
 
@@ -60,7 +63,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
         setIsLoading(true);
 
         try {
-            await axios.post('/api/bookings', {
+            await axios.post('/api/reservations', {
                 totalPrice,
                 startDate: dateRange.startDate,
                 endDate: dateRange.endDate,
@@ -68,7 +71,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
             });
             toast.success('Activity reserved!');
             setDateRange(initialDateRange);
-            router.push('/trips');
+            router.push('/reservations');
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 toast.error(error.response?.data?.error || 'Something went wrong.');
@@ -120,7 +123,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
                             difficulty={listing.difficulty}
                             minParticipants={listing.minParticipants}
                             maxParticipants={listing.maxParticipants}
-                            ageRestriction={listing.ageRestriction}
+                            ageRestriction={listing.ageRestriction as number}
                             equipment={listing.equipment}
                             locationName={listing.locationName}
                             locationAddress={listing.locationAddress}

@@ -6,6 +6,7 @@ import Image from "next/image";
 import HeartButton from "../HeartButton";
 import { SafeUser } from "../../types";
 import React from "react";
+import useCountryData from "@/src/hooks/useCountryData";
 
 interface ListingHeadProps {
     title: string;
@@ -58,7 +59,3 @@ const ListingHead: React.FC<ListingHeadProps> = ({
 }
 
 export default ListingHead;
-
-function useCountryData(): { getByValue: any; } {
-    throw new Error("Function not implemented.");
-}

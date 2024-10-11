@@ -1,47 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import EmptyState from "../../components/EmptyState";
-import ClientOnly from "../../components/navbar/ClientOnly";
-import FavoritesClient from "./FavoritesClient";
-import { SafeListing } from "../../types";
-import { getFavoriteListings } from "../../actions/getFavoriteListings";
+import { getFavoriteListings } from "@/src/actions/getFavoriteListings";
+import EmptyState from "@/src/components/EmptyState";
+import ClientOnly from "@/src/components/navbar/ClientOnly";
 import { useCurrentUser } from "@/src/hooks/useCurrentUser";
+import { SafeListing } from "@/src/types";
+import { useState, useCallback, useEffect } from "react";
+import toast from "react-hot-toast";
+import FavoritesClient from "./FavoritesClient";
 
-const convertToSafeListing = (listing: any): SafeListing => ({
-  ...listing,
-  createdAt: new Date(listing.createdAt).toISOString(),
-  updatedAt: new Date(listing.updatedAt).toISOString(),
-  user: {
-    ...listing.user,
-    createdAt: new Date(listing.user.createdAt).toISOString(),
-    updatedAt: new Date(listing.user.updatedAt).toISOString(),
-    emailVerified: listing.user.emailVerified ? new Date(listing.user.emailVerified).toISOString() : null,
-  },
-  bookings: [], 
-  reviews: [], 
-});
 
 const FavoritesPage = () => {
-    const currentUser = useCurrentUser();
+    const { user: currentUser, isLoading: userLoading } = useCurrentUser();
     const [listings, setListings] = useState<SafeListing[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchFavorites = async () => {
-            if (currentUser) {
-                const rawListings = await getFavoriteListings(currentUser.id);
-                const safeListings = rawListings.map(convertToSafeListing);
-                setListings(safeListings);
-            }
+    const fetchFavorites = useCallback(async () => {
+        try {
+            setLoading(true);
+            const favorites = await getFavoriteListings();
+            setListings(favorites);
+        } catch (error) {
+            console.error("Error fetching favorites:", error);
+            toast.error("Failed to load favorites");
+        } finally {
             setLoading(false);
-        };
+        }
+    }, []);
 
-        fetchFavorites();
-    }, [currentUser]);
+    useEffect(() => {
+        if (!userLoading) {
+            fetchFavorites();
+        }
+    }, [userLoading, fetchFavorites]);
 
-    if (loading) {
-        return <div>Loading...</div>;
+    if (userLoading || loading) {
+        return <ClientOnly><div>Loading...</div></ClientOnly>;
     }
 
     if (!currentUser) {

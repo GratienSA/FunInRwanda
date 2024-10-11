@@ -72,79 +72,48 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, onClose }
       <Form {...form}>
         <form 
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-6"
+          className="space-y-6 max-w-md mx-auto"
         >
           <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      disabled={isPending}
-                      placeholder="John Doe"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      disabled={isPending}
-                      placeholder="john.doe@example.com"
-                      type="email"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      disabled={isPending}
-                      placeholder="******"
-                      type="password"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {["name", "email", "password"].map((fieldName) => (
+              <FormField
+                key={fieldName}
+                control={form.control}
+                name={fieldName as "name" | "email" | "password"}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">{fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        disabled={isPending}
+                        placeholder={fieldName === "name" ? "John Doe" : fieldName === "email" ? "john.doe@example.com" : "******"}
+                        type={fieldName === "password" ? "password" : "text"}
+                        className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 transition duration-200"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs text-red-500" />
+                  </FormItem>
+                )}
+              />
+            ))}
           </div>
           <FormError message={error} />
           <FormSuccess message={success} />
           <Button
             disabled={isPending}
             type="submit"
-            className="w-full"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md transition duration-200"
           >
-            Create an account
+            {isPending ? "Creating..." : "Create an account"}
           </Button>
         </form>
       </Form>
       {onClose && (
-        <Button onClick={onClose} className="mt-4 w-full">
+        <Button onClick={onClose} className="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-md transition duration-200">
           Close
         </Button>
       )}
     </CardWrapper>
   );
-};
+}

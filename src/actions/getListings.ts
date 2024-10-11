@@ -1,25 +1,63 @@
-"use server";
+
 import prismadb from "../lib/prismadb";
-import { SafeBooking, SafeListing, SafeReview, SafeUser } from "../types";
+import { SafeListing, SafeUser, SafeBooking, SafeReview } from "../types";
+import { z } from "zod";
 
-export interface IListingsParams {
-  userId?: string;
-  category?: string;
-  activityType?: string;
-  difficulty?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  minDuration?: number;
-  maxDuration?: number;
-  locationName?: string;
-  startDate?: string;
-  endDate?: string;
-}
+export const ListingsParamsSchema = z.object({
+  page: z.number().optional(),
+  limit: z.number().optional(),
+  category: z.string().optional(),
+  activityType: z.string().optional(),
+  difficulty: z.string().optional(),
+  minPrice: z.number().optional(),
+  maxPrice: z.number().optional(),
+  minDuration: z.number().optional(),
+  maxDuration: z.number().optional(),
+  minParticipants: z.number().optional(),
+  maxParticipants: z.number().optional(),
+  ageRestriction: z.number().optional(),
+  locationName: z.string().optional(),
+  isInstantBook: z.boolean().optional(),
+});
 
-export default async function getListings(params: IListingsParams): Promise<SafeListing[]> {
+export type IListingsParams = z.infer<typeof ListingsParamsSchema>;
+
+const transformToSafeListing = (listing: any): SafeListing => ({
+  ...listing,
+  createdAt: listing.createdAt.toISOString(),
+  updatedAt: listing.updatedAt.toISOString(),
+  user: transformToSafeUser(listing.user),
+  bookings: listing.bookings.map(transformToSafeBooking),
+  reviews: listing.reviews.map(transformToSafeReview),
+});
+
+const transformToSafeUser = (user: any): SafeUser => ({
+  ...user,
+  createdAt: user.createdAt.toISOString(),
+  updatedAt: user.updatedAt.toISOString(),
+  emailVerified: user.emailVerified?.toISOString() || null,
+});
+
+const transformToSafeBooking = (booking: any): SafeBooking => ({
+  ...booking,
+  createdAt: booking.createdAt.toISOString(),
+  updatedAt: booking.updatedAt.toISOString(),
+  startDate: booking.startDate.toISOString(),
+  endDate: booking.endDate.toISOString(),
+});
+
+const transformToSafeReview = (review: any): SafeReview => ({
+  ...review,
+  createdAt: review.createdAt.toISOString(),
+  updatedAt: review.updatedAt.toISOString(),
+});
+
+export default async function getListings(params: IListingsParams): Promise<{ listings: SafeListing[], totalCount: number }> {
   try {
-    const {
-      userId,
+    const validatedParams = ListingsParamsSchema.parse(params);
+    const { 
+      page = 1, 
+      limit = 10, 
       category,
       activityType,
       difficulty,
@@ -27,109 +65,74 @@ export default async function getListings(params: IListingsParams): Promise<Safe
       maxPrice,
       minDuration,
       maxDuration,
+      minParticipants,
+      maxParticipants,
+      ageRestriction,
       locationName,
-      startDate,
-      endDate
-    } = params;
+      isInstantBook
+    } = validatedParams;
 
-    let query: any = {};
+    const skip = (page - 1) * limit;
 
-    if (userId) {
-      query.userId = userId;
-    }
+    let filter: any = {};
 
-    if (category) {
-      query.category = category;
-    }
-
-    if (activityType) {
-      query.activityType = activityType;
-    }
-
-    if (difficulty) {
-      query.difficulty = difficulty;
-    }
+    if (category) filter.category = category;
+    if (activityType) filter.activityType = activityType;
+    if (difficulty) filter.difficulty = difficulty;
+    if (locationName) filter.locationName = { contains: locationName };
+    if (isInstantBook !== undefined) filter.isInstantBook = isInstantBook;
 
     if (minPrice !== undefined || maxPrice !== undefined) {
-      query.price = {};
-      if (minPrice !== undefined) {
-        query.price.gte = minPrice;
-      }
-      if (maxPrice !== undefined) {
-        query.price.lte = maxPrice;
-      }
+      filter.price = {};
+      if (minPrice !== undefined) filter.price.gte = minPrice;
+      if (maxPrice !== undefined) filter.price.lte = maxPrice;
     }
 
     if (minDuration !== undefined || maxDuration !== undefined) {
-      query.duration = {};
-      if (minDuration !== undefined) {
-        query.duration.gte = minDuration;
+      filter.duration = {};
+      if (minDuration !== undefined) filter.duration.gte = minDuration;
+      if (maxDuration !== undefined) filter.duration.lte = maxDuration;
+    }
+
+    if (minParticipants !== undefined || maxParticipants !== undefined) {
+      filter.minParticipants = {};
+      filter.maxParticipants = {};
+      if (minParticipants !== undefined) {
+        filter.maxParticipants.gte = minParticipants;
       }
-      if (maxDuration !== undefined) {
-        query.duration.lte = maxDuration;
+      if (maxParticipants !== undefined) {
+        filter.minParticipants.lte = maxParticipants;
       }
     }
 
-    if (locationName) {
-      query.locationName = { contains: locationName, mode: 'insensitive' };
+    if (ageRestriction !== undefined) {
+      filter.ageRestriction = { lte: ageRestriction };
     }
 
-    if (startDate && endDate) {
-      query.NOT = {
-        bookings: {
-          OR: [
-            {
-              endDate: { gte: startDate },
-              startDate: { lte: startDate },
-            },
-            { 
-              startDate: { lte: endDate },
-              endDate: { gte: endDate },
-            },
-          ]
-        }
-      }
-    }
+    const [listings, totalCount] = await Promise.all([
+      prismadb.listing.findMany({
+        where: filter,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: true,
+          bookings: { include: { listing: true } },
+          reviews: true,
+        },
+        skip,
+        take: limit,
+      }),
+      prismadb.listing.count({ where: filter }),
+    ]);
 
-    const listings = await prismadb.listing.findMany({
-      where: query,
-      orderBy: {
-        createdAt: 'desc'
-      },
-      include: {
-        user: true,
-        bookings: true,
-        reviews: true
-      }
-    });
+    console.log("Total Count of Listings:", totalCount);
+    console.log("Raw Listings from DB:", listings);
 
-    const safeListings: SafeListing[] = listings.map((listing) => ({
-      ...listing,
-      createdAt: listing.createdAt.toISOString(),
-      updatedAt: listing.updatedAt.toISOString(),
-      user: {
-        ...listing.user,
-        createdAt: listing.user.createdAt.toISOString(),
-        updatedAt: listing.user.updatedAt.toISOString(),
-        emailVerified: listing.user.emailVerified?.toISOString() || null,
-      } as SafeUser,
-      bookings: listing.bookings.map(booking => ({
-        ...booking,
-        createdAt: booking.createdAt.toISOString(),
-        updatedAt: booking.updatedAt.toISOString(),
-        startDate: booking.startDate.toISOString(),
-        endDate: booking.endDate.toISOString(),
-      } as SafeBooking)),
-      reviews: listing.reviews.map(review => ({
-        ...review,
-        createdAt: review.createdAt.toISOString(),
-        updatedAt: review.updatedAt.toISOString(),
-      } as SafeReview))
-    }));
+    const safeListings = listings.map(transformToSafeListing);
 
-    return safeListings;
-  } catch (error: any) {
+    return { listings: safeListings, totalCount };
+    
+  } catch (error) {
     console.error("Error fetching listings:", error);
-    throw new Error(error.message || "Error fetching listings");
+    return { listings: [], totalCount: 0 };
   }
 }

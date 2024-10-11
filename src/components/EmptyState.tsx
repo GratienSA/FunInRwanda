@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Heading from './Heading';
 import Button from './navbar/Button';
 
@@ -17,6 +17,16 @@ const EmptyState: React.FC<EmptyStateProps> = ({
     showReset
 }) => {
     const router = useRouter();
+    
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) {
+        return null;
+    }
 
     return (
         <div 
@@ -45,6 +55,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
             </div>
         </div>
     );
-}
+};
 
 export default EmptyState;
+

@@ -1,3 +1,5 @@
+"use client"
+
 import getBookings from "@/src/actions/getBookings";
 import getListingById from "@/src/actions/getListingById";
 import EmptyState from "@/src/components/EmptyState";

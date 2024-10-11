@@ -3,18 +3,15 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
-import { format } from "date-fns";
+import { FaStar } from "react-icons/fa";
 
 import HeartButton from "../HeartButton";
-
 import Button from "../navbar/Button";
 import { SafeBooking, SafeListing, SafeUser } from "../../types";
-import useCountryData from "../../hooks/useCountryData";
-
 
 interface ListingCardProps {
   data: SafeListing;
-  booking?: SafeBooking
+  booking?: SafeBooking;
   onAction?: (id: string) => void;
   disabled?: boolean;
   actionLabel?: string;
@@ -32,77 +29,76 @@ const ListingCard: React.FC<ListingCardProps> = ({
   currentUser,
 }) => {
   const router = useRouter();
-  const { getByValue } = useCountryData();
 
-  const location = getByValue(data.locationName);
+
 
   const handleCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
-
-      if (disabled) {
-        return;
-      }
-
+      if (disabled) return;
       onAction?.(actionId);
     },
     [disabled, onAction, actionId]
   );
 
-  const price = useMemo(() => {
-    if (booking) {
-      return booking.totalPrice;
-    }
+  const price = useMemo(() => booking ? booking.totalPrice : data.price, [booking, data.price]);
+  const formattedPrice = useMemo(() => {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: data.currency,
+    }).format(price);
+  }, [price, data.currency]);
 
-    return data.price;
-  }, [booking, data.price]);
-
-  const bookingDate = useMemo(() => {
-    if (!booking) {
-      return null;
-    }
-
-    const start = new Date(booking.startDate);
-    const end = new Date(booking.endDate);
-
-    return `${format(start, "PP")} - ${format(end, "PP")}`;
-  }, [booking]);
 
   return (
-    <div
-      onClick={() => router.push(`/listings/${data.id}`)}
-      className="col-span-1 cursor-pointer group"
+    <div 
+      onClick={() => router.push(`/listings/${data.id}`)} 
+      className="group cursor-pointer"
     >
-      <div className="flex flex-col gap-2 w-full">
-        <div className="aspect-square w-full relative overflow-hidden rounded-xl">
+      <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out">
+        <div className="relative h-64 w-full">
           <Image
+            src={data.imageSrc[0] || '/placeholder.jpg'}
+            alt={data.title}
             fill
-            alt="Listing"
-            src={data.imageSrc[0]}
-            className="object-cover h-full w-full group-hover:scale-110 transition"
+            style={{ objectFit: "cover" }}
+            className="group-hover:scale-105 transition-transform duration-300 ease-in-out"
           />
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-3 right-3 z-10">
             <HeartButton listingId={data.id} currentUser={currentUser} />
           </div>
+          {data.isInstantBook && (
+            <span className="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
+              Réservation instantanée
+            </span>
+          )}
         </div>
-        <div className="font-semibold text-lg">
-          {location?.region}, {location?.name}
+        <div className="p-4">
+          <h2 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">{data.title}</h2>
+          <p className="text-sm text-gray-600 mb-2 line-clamp-2">{data.description}</p>
+          <div className="flex justify-between items-end mt-4">
+            <div className="text-lg font-bold text-blue-600">
+              {formattedPrice}
+              <span className="text-sm font-normal text-gray-600 ml-1">
+                {!booking && "/par personne"}
+              </span>
+            </div>
+            <div className="flex items-center">
+              <FaStar className="text-yellow-400 mr-1" />
+              <span className="text-sm font-medium">{data.reviewAverage.toFixed(1)}</span>
+              <span className="text-sm text-gray-500 ml-1">({data.reviewCount})</span>
+            </div>
+          </div>
+          {onAction && actionLabel && (
+            <Button
+              disabled={disabled}
+              small
+              label={actionLabel}
+              onClick={handleCancel}
+              className="w-full mt-4 rounded-full bg-blue-600 hover:bg-blue-700 transition-colors duration-300"
+            />
+          )}
         </div>
-        <div className="font-light text-neutral-500">
-          {bookingDate || data.category}
-        </div>
-        <div className="flex flex-row items-center gap-1">
-          <div className="font-semibold">$ {price}</div>
-          {!booking && <div className="font-light">night</div>}
-        </div>
-        {onAction && actionLabel && (
-          <Button
-            disabled={disabled}
-            small
-            label={actionLabel}
-            onClick={handleCancel}
-          />
-        )}
       </div>
     </div>
   );

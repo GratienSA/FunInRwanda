@@ -24,7 +24,7 @@ interface ListingInfoProps {
     difficulty: string;
     minParticipants: number;
     maxParticipants: number;
-    ageRestriction: string | null;
+    ageRestriction: number;
     equipment: string[];
     locationName: string;
     locationAddress: string;

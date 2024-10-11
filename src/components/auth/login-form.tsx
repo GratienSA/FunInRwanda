@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -115,6 +115,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onClose }) => {
                           disabled={isPending}
                           placeholder="john.doe@example.com"
                           type="email"
+                          className="w-full p-2 border border-gray-300 rounded-md focus:border-blue-500"
                         />
                       </FormControl>
                       <FormMessage />
@@ -133,13 +134,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onClose }) => {
                           disabled={isPending}
                           placeholder="******"
                           type="password"
+                          className="w-full p-2 border border-gray-300 rounded-md focus:border-blue-500"
                         />
                       </FormControl>
                       <Button
                         size="sm"
                         variant="link"
                         asChild
-                        className="px-0 font-normal"
+                        className="px-0 font-normal text-blue-600"
                       >
                         <Link href="/auth/reset">
                           Forgot password?
@@ -154,13 +156,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onClose }) => {
           </div>
           <FormError message={error || urlError} />
           <FormSuccess message={success} />
-          <Button disabled={isPending} type="submit" className="w-full">
+          <Button disabled={isPending} type="submit" className="w-full bg-blue-600 text-white rounded-md p-2 hover:bg-blue-700">
             {showTwoFactor ? "Confirm" : "Login"}
           </Button>
         </form>
       </Form>
       {onClose && (
-        <Button onClick={onClose} className="mt-4 w-full">
+        <Button onClick={onClose} className="mt-4 w-full bg-gray-300 rounded-md">
           Close
         </Button>
       )}

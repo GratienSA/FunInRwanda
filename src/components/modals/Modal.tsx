@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useState, useRef, ReactElement } from "react";
 import { IoMdClose } from "react-icons/io";
 import Button from "../navbar/Button";
 
@@ -9,12 +9,13 @@ interface ModalsProps {
     onClose: () => void;
     onSubmit: () => void;
     title?: string;
-    body?: React.ReactElement;
+    body?: React.ReactElement | null;
     footer?: React.ReactElement;
     actionLabel: string;
     disabled?: boolean;
     secondaryAction?: () => void;
     secondaryActionLabel?: string;
+    isLoading?: boolean;
 }
 
 const Modal: React.FC<ModalsProps> = ({
@@ -27,7 +28,7 @@ const Modal: React.FC<ModalsProps> = ({
     actionLabel,
     disabled,
     secondaryAction,
-    secondaryActionLabel
+    secondaryActionLabel,
 }) => {
     const [showModal, setShowModal] = useState(isOpen);
     const modalRef = useRef<HTMLDivElement>(null);

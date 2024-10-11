@@ -17,16 +17,18 @@ const Counter: React.FC<CounterProps> = ({
     onChange
 }) => {
     const onAdd = useCallback(() => {
+        console.log("Add clicked");
         onChange(value + 1);
     }, [onChange, value]);
-
+    
     const onSubtract = useCallback(() => {
+        console.log("Subtract clicked");
         if (value === 1) {
             return;
         }
         onChange(value - 1);
     }, [onChange, value]);
-
+    
     return (
         <div className="flex flex-row items-center justify-between">
             <div className="flex flex-col">
