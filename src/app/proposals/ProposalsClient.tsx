@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { SafeListing, SafeUser } from "../../types";
-import { useCallback, useState } from "react";
-import axios from "axios";
+import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import Container from "../../components/Container";
-import Heading from "../../components/Heading";
-import ListingCard from "../../components/listings/ListingCard";
+import { SafeListing, SafeUser } from '../../types';
+import Container from '../../components/Container';
+import Heading from '../../components/Heading';
+import { FiEdit2, FiTrash2, FiUser } from 'react-icons/fi'; 
+import Image from 'next/image';
 
 interface ProposalsClientProps {
   listings: SafeListing[];
@@ -19,45 +20,78 @@ const ProposalsClient: React.FC<ProposalsClientProps> = ({
   currentUser,
 }) => {
   const router = useRouter();
-  const [deletingId, setDeletingId] = useState('');
 
-  const onCancel = useCallback(async (id: string) => {
+  const onDelete = useCallback(async (id: string) => {
     try {
-      setDeletingId(id);
       await axios.delete(`/api/listings/${id}`);
-      toast.success('Listing cancelled');
+      toast.success('Annonce supprimée');
       router.refresh();
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.error || 'Something went wrong');
-      } else {
-        toast.error('An unexpected error occurred');
-      }
-    } finally {
-      setDeletingId('');
+      toast.error('Une erreur est survenue lors de la suppression');
     }
+  }, [router]);
+
+  const onEdit = useCallback((id: string) => {
+    router.push(`/proposals/${id}/edit`);
+  }, [router]);
+
+  const onProfileClick = useCallback(() => {
+    router.push('/profile');
   }, [router]);
 
   return (
     <Container>
-      <Heading
-        title="Proposals"
-        subtitle="List of your proposals"
-      />
-      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8">
+      <div className="flex justify-between items-center mb-8">
+        <Heading
+          title="Mes Annonces"
+          subtitle="Gérez vos propositions d'activités"
+        />
+        <button 
+          onClick={onProfileClick}
+          className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition"
+        >
+          <FiUser className="mr-2" />
+          Mon Profil
+        </button>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {listings.length === 0 ? (
-          <div className="col-span-full text-center text-neutral-500">No proposals found.</div>
+          <div className="col-span-full text-center text-gray-500 py-10">
+            Aucune annonce trouvée. Commencez par en créer une !
+          </div>
         ) : (
           listings.map((listing) => (
-            <ListingCard
-              key={listing.id}
-              data={listing}
-              actionId={listing.id}
-              onAction={onCancel}
-              disabled={deletingId === listing.id}
-              actionLabel="Cancel listing"
-              currentUser={currentUser}
-            />
+            <div key={listing.id} className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
+              <div className="relative h-48">
+                <Image
+                  src={listing.imageSrc[0] || '/placeholder.jpg'}
+                  alt={listing.title}
+                  layout="fill"
+                  objectFit="cover"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="text-lg font-semibold mb-2">{listing.title}</h3>
+                <p className="text-gray-600 mb-4 truncate">{listing.description}</p>
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-500 font-bold">{listing.price}€</span>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => onEdit(listing.id)}
+                      className="p-2 bg-yellow-100 text-yellow-600 rounded-full hover:bg-yellow-200 transition"
+                    >
+                      <FiEdit2 size={18} />
+                    </button>
+                    <button
+                      onClick={() => onDelete(listing.id)}
+                      className="p-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition"
+                    >
+                      <FiTrash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           ))
         )}
       </div>

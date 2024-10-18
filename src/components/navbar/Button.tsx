@@ -2,13 +2,14 @@
 
 import { IconType } from "react-icons";
 
-interface ButtonProps {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     label: string;
-    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     disabled?: boolean;
     outline?: boolean;
     small?: boolean;
     icon?: IconType;
+    
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -17,12 +18,16 @@ const Button: React.FC<ButtonProps> = ({
     disabled,
     outline,
     small,
-    icon: Icon
+    icon: Icon,
+    className,
+    type = "button",
+    ...props
 }) => {
     return (
         <button
             onClick={onClick}
             disabled={disabled}
+            type={type}
             className={`
                 relative
                 disabled:opacity-70
@@ -38,7 +43,9 @@ const Button: React.FC<ButtonProps> = ({
                 ${small ? 'text-sm' : 'text-md'}
                 ${small ? 'font-light' : 'font-semibold'}
                 ${small ? 'border-[1px]' : 'border-2'}
+                ${className || ''}
             `}
+            {...props}
         >
             {Icon && (
                 <Icon

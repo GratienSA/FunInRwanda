@@ -3,6 +3,32 @@ import { currentUser } from "@/src/lib/auth";
 import prismadb from "@/src/lib/prismadb";
 import { Prisma } from "@prisma/client";
 
+
+export async function GET(request: Request) {
+  const user = await currentUser();
+
+  if (!user) {
+    console.log("Unauthorized access attempt");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const listings = await prismadb.listing.findMany({
+      where: {
+        userId: user.id
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    return NextResponse.json(listings);
+  } catch (error) {
+    console.error("Error fetching listings:", error);
+    return NextResponse.json({ error: "Error fetching listings" }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   const user = await currentUser();
 

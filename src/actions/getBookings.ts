@@ -1,7 +1,7 @@
 "use server";
 
 import prismadb from "../lib/prismadb";
-import { formatCurrency, ReceivedBooking, SafeBooking, SafeListing, SafeUser } from "../types";
+import { ReceivedBooking, SafeBooking, SafeListing, SafeUser } from "../types";
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
@@ -207,75 +207,9 @@ export async function deleteBooking(id: string) {
 }
 
 export async function fetchFilteredBookings(query: string, currentPage: number): Promise<(ReceivedBooking | null)[]> {
-    const ITEMS_PER_PAGE = 10;
-    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
     try {
-        console.log('Fetching bookings with query:', query, 'and currentPage:', currentPage);
-
-        const aggregationPipeline = [
-            {
-                $match: query
-                    ? {
-                          $or: [
-                              { "user.name": { $regex: query, $options: "i" } },
-                              { "user.email": { $regex: query, $options: "i" } },
-                              { "listing.title": { $regex: query, $options: "i" } },
-                          ],
-                      }
-                    : {},
-            },
-            {
-                $lookup: {
-                    from: "User",
-                    localField: "userId",
-                    foreignField: "_id",
-                    as: "user",
-                },
-            },
-            {
-                $lookup: {
-                    from: "Listing",
-                    localField: "listingId",
-                    foreignField: "_id",
-                    as: "listing",
-                },
-            },
-            { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-            { $unwind: { path: "$listing", preserveNullAndEmptyArrays: true } },
-            {
-                $project: {
-                    id: { $toString: "$_id" },
-                    userId: { $toString: "$userId" },
-                    listingId: { $toString: "$listingId" },
-                    startDate: 1,
-                    endDate: 1,
-                    totalPrice: 1,
-                    createdAt: 1,
-                    updatedAt: 1,
-                    status: {
-                        $cond: {
-                            if: { $gt: ["$startDate", "$$NOW"] },
-                            then: "Upcoming",
-                            else: {
-                                $cond: {
-                                    if: { $lt: ["$endDate", "$$NOW"] },
-                                    then: "Completed",
-                                    else: "Active"
-                                }
-                            }
-                        }
-                    },
-                    "user.name": 1,
-                    "user.email": 1,
-                    "user.image": 1,
-                    "listing.title": 1,
-                },
-            },
-            { $skip: offset },
-            { $limit: ITEMS_PER_PAGE },
-        ];
-
+    
         const bookings = await prismadb.booking.findMany({
             include: {
               user: true,
@@ -371,7 +305,7 @@ export type State = {
     };
   };
 
-export async function createBooking(prevState: State, formData: FormData) {
+export async function createBooking(formData: FormData) {
     const validatedFields = CreateBooking.safeParse({
         userId: formData.get('userId'),
         listingId: formData.get('listingId'),
@@ -411,7 +345,6 @@ export async function createBooking(prevState: State, formData: FormData) {
 
 export async function updateBooking(
     id: string,
-    prevState: any,
     formData: FormData
 ) {
     const validatedFields = UpdateBooking.safeParse({

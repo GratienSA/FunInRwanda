@@ -17,6 +17,8 @@ interface ListingCardProps {
   actionLabel?: string;
   actionId?: string;
   currentUser?: SafeUser | null;
+  secondaryAction?: (id: string) => void;
+  secondaryActionLabel?: string;
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({
@@ -27,10 +29,10 @@ const ListingCard: React.FC<ListingCardProps> = ({
   actionLabel,
   actionId = "",
   currentUser,
+  secondaryAction,
+  secondaryActionLabel,
 }) => {
   const router = useRouter();
-
-
 
   const handleCancel = useCallback(
     (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -41,6 +43,15 @@ const ListingCard: React.FC<ListingCardProps> = ({
     [disabled, onAction, actionId]
   );
 
+  const handleSecondaryAction = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      if (disabled) return;
+      secondaryAction?.(actionId);
+    },
+    [disabled, secondaryAction, actionId]
+  );
+
   const price = useMemo(() => booking ? booking.totalPrice : data.price, [booking, data.price]);
   const formattedPrice = useMemo(() => {
     return new Intl.NumberFormat('fr-FR', {
@@ -48,7 +59,6 @@ const ListingCard: React.FC<ListingCardProps> = ({
       currency: data.currency,
     }).format(price);
   }, [price, data.currency]);
-
 
   return (
     <div 
@@ -89,15 +99,26 @@ const ListingCard: React.FC<ListingCardProps> = ({
               <span className="text-sm text-gray-500 ml-1">({data.reviewCount})</span>
             </div>
           </div>
-          {onAction && actionLabel && (
-            <Button
-              disabled={disabled}
-              small
-              label={actionLabel}
-              onClick={handleCancel}
-              className="w-full mt-4 rounded-full bg-blue-600 hover:bg-blue-700 transition-colors duration-300"
-            />
-          )}
+          <div className="flex gap-2 mt-4">
+            {onAction && actionLabel && (
+              <Button
+                disabled={disabled}
+                small
+                label={actionLabel}
+                onClick={handleCancel}
+                className="flex-1 rounded-full bg-blue-600 hover:bg-blue-700 transition-colors duration-300"
+              />
+            )}
+            {secondaryAction && secondaryActionLabel && (
+              <Button
+                disabled={disabled}
+                small
+                label={secondaryActionLabel}
+                onClick={handleSecondaryAction}
+                className="flex-1 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors duration-300"
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

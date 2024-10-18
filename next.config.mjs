@@ -7,6 +7,9 @@ const nextConfig = {
     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET,
   },
+  experimental: {
+    serverComponentsExternalPackages: ['cloudinary'],
+  },
   images: {
     remotePatterns: [
       {

@@ -1,24 +1,39 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useForm } from "react-hook-form";
-import ImageUpload from "../inputs/ImageUpload";
 import Heading from "../Heading";
 import { BookingFormData } from '@/src/types'; 
+import Image from 'next/image';
 
 interface StepImagesProps {
-  imageSrc: string[]; 
+  imageSrc: string | string[]; 
   setCustomValue: (id: keyof BookingFormData, value: any) => void;
 }
 
 const StepImages: React.FC<StepImagesProps> = ({ imageSrc, setCustomValue }) => {
   const { register, handleSubmit } = useForm<{ profile: FileList }>();
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Ensure imageSrc is always an array
+  const imageSrcArray = Array.isArray(imageSrc) ? imageSrc : (imageSrc ? [imageSrc] : []);
+
+  // Function to ensure URL is valid for Next.js Image component
+  const getValidImageUrl = (url: string) => {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    // If it's a relative URL, ensure it starts with a slash
+    return url.startsWith('/') ? url : `/${url}`;
+  };
 
   const onSubmit = useCallback(async (data: { profile: FileList }) => {
     if (data.profile.length === 0) {
       console.error("No file selected");
       return;
     }
+
+    setIsUploading(true);
 
     const image = data.profile[0];
     const formData = new FormData();
@@ -41,12 +56,17 @@ const StepImages: React.FC<StepImagesProps> = ({ imageSrc, setCustomValue }) => 
       const uploadedImageData = await uploadResponse.json();
       const imageUrl = uploadedImageData.secure_url;
       
-      setCustomValue('imageSrc', [...imageSrc, imageUrl]);
+      setCustomValue('imageSrc', [...imageSrcArray, imageUrl]);
     } catch (error) {
       console.error("Error uploading image:", error);
-      // Vous pourriez vouloir afficher une erreur à l'utilisateur ici
+    } finally {
+      setIsUploading(false);
     }
-  }, [imageSrc, setCustomValue]);
+  }, [imageSrcArray, setCustomValue]);
+
+  const removeImage = useCallback((indexToRemove: number) => {
+    setCustomValue('imageSrc', imageSrcArray.filter((_, index) => index !== indexToRemove));
+  }, [imageSrcArray, setCustomValue]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -68,14 +88,34 @@ const StepImages: React.FC<StepImagesProps> = ({ imageSrc, setCustomValue }) => 
         </p>
         <button
           type="submit"
-          className="text-gray-900 bg-gradient-to-r from-lime-200 via-lime-400 to-lime-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-lime-300 dark:focus:ring-lime-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 my-4"
+          disabled={isUploading}
+          className="text-gray-900 bg-gradient-to-r from-lime-200 via-lime-400 to-lime-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-lime-300 dark:focus:ring-lime-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 my-4 disabled:opacity-50"
         >
-          Upload to Cloud
+          {isUploading ? 'Uploading...' : 'Upload to Cloud'}
         </button>
       </form>
-      {(!imageSrc || imageSrc.length === 0) && (
+      {imageSrcArray.length === 0 && (
         <p className="text-red-500">Please upload at least one image.</p>
       )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {imageSrcArray.map((src, index) => (
+          <div key={index} className="relative">
+            <Image 
+              src={getValidImageUrl(src)} 
+              alt={`Uploaded image ${index + 1}`} 
+              width={300} 
+              height={200} 
+              className="rounded-lg" 
+            />
+            <button
+              onClick={() => removeImage(index)}
+              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

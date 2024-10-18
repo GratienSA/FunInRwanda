@@ -5,6 +5,7 @@ import { UserRole } from "@prisma/client";
 interface CurrentUserHookResult {
   user: SafeUser | null;
   isLoading: boolean;
+  
 }
 
 export const useCurrentUser = (): CurrentUserHookResult => {

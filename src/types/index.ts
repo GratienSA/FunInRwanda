@@ -12,6 +12,9 @@ export interface ExtendedUser extends User {
 }
 
 export type SafeUser = Omit<User, "createdAt" | "updatedAt" | "emailVerified"> & {
+  id: string;
+  name: string;
+  email: string;
   createdAt: string; // Format de date sous forme de chaîne
   updatedAt: string; // Format de date sous forme de chaîne
   emailVerified: string | null; // Peut être null
@@ -143,7 +146,7 @@ export type ReceivedBooking = {
   user: {
       name: string | null
       email: string | null
-      image: string | null
+      profileImage: string | null
   }
   listing: {
       title: string
@@ -155,7 +158,7 @@ export type FormattedCustomersTable = {
   id: string
   name: string
   email: string
-  image: string
+  profileImage: string
   total_bookings: number
   total_pending: string
   total_paid: string

@@ -2,7 +2,7 @@
 
 import Modal from './Modal'
 import { useState, useCallback, useMemo } from 'react'
-import { useForm, FieldValues, SubmitHandler } from 'react-hook-form'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import StepCategory from '../steps/StepCategory'

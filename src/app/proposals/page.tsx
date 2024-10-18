@@ -4,28 +4,35 @@ import { useEffect, useState } from "react";
 import EmptyState from "../../components/EmptyState";
 import ClientOnly from "../../components/navbar/ClientOnly";
 import ProposalsClient from "./ProposalsClient";
-import getListings from "../../actions/getListings";
 import { useCurrentUser } from "@/src/hooks/useCurrentUser";
 import { SafeListing } from "../../types";
 
 const ProposalsPage = () => {
-  const currentUser = useCurrentUser();
+  const { user: currentUser, isLoading: userLoading } = useCurrentUser();
   const [listings, setListings] = useState<SafeListing[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchListings = async () => {
-      if (currentUser) {
-        const fetchedListings = await getListings({ userId: currentUser.id });
-        setListings(fetchedListings);
+      if (currentUser && currentUser.id) {
+        try {
+          const response = await fetch(`/api/listings?userId=${currentUser.id}`);
+          if (!response.ok) throw new Error('Failed to fetch listings');
+          const data = await response.json();
+          setListings(data);
+        } catch (error) {
+          console.error('Error fetching listings:', error);
+        }
       }
       setLoading(false);
     };
 
-    fetchListings();
-  }, [currentUser]);
+    if (!userLoading) {
+      fetchListings();
+    }
+  }, [currentUser, userLoading]);
 
-  if (loading) {
+  if (userLoading || loading) {
     return <div>Loading...</div>;
   }
 

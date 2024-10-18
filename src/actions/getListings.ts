@@ -4,6 +4,7 @@ import { SafeListing, SafeUser, SafeBooking, SafeReview } from "../types";
 import { z } from "zod";
 
 export const ListingsParamsSchema = z.object({
+  userId: z.string().optional(),
   page: z.number().optional(),
   limit: z.number().optional(),
   category: z.string().optional(),
@@ -56,6 +57,7 @@ export default async function getListings(params: IListingsParams): Promise<{ li
   try {
     const validatedParams = ListingsParamsSchema.parse(params);
     const { 
+      userId,
       page = 1, 
       limit = 10, 
       category,
@@ -76,6 +78,7 @@ export default async function getListings(params: IListingsParams): Promise<{ li
 
     let filter: any = {};
 
+    if (userId) filter.userId = userId;
     if (category) filter.category = category;
     if (activityType) filter.activityType = activityType;
     if (difficulty) filter.difficulty = difficulty;
@@ -108,6 +111,8 @@ export default async function getListings(params: IListingsParams): Promise<{ li
     if (ageRestriction !== undefined) {
       filter.ageRestriction = { lte: ageRestriction };
     }
+
+    console.log("Filter:", filter);
 
     const [listings, totalCount] = await Promise.all([
       prismadb.listing.findMany({

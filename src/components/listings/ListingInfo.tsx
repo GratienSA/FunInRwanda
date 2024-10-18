@@ -1,6 +1,7 @@
+"use client"
+
 import React from 'react';
 import { IconType } from 'react-icons';
-
 import Avatar from '../navbar/Avatar';
 import ListingCategory from './ListingCategory';
 import dynamic from 'next/dynamic';
@@ -77,7 +78,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
 
                 <hr />
 
-                {category && (
+                {category && category.icon && (
                     <ListingCategory
                         icon={category.icon}
                         label={category.label}

@@ -62,5 +62,5 @@ export const RegisterSchema = z.object({
   name: z.string().min(1, {
     message: "Name is required",
   }),
-  image: z.string().optional().nullable(),
+  profileImage: z.string().optional().nullable(),
 });

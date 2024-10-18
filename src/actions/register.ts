@@ -15,7 +15,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         return { error: "Champs invalides", issues: validatedFields.error.issues };
     }
 
-    const { email, password, name, image } = validatedFields.data;
+    const { email, password, name, profileImage } = validatedFields.data;
 
     const existingUser = await getUserByEmail(email);
 
@@ -31,7 +31,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
                 email: email.toLowerCase(),
                 hashedPassword,
                 name,
-                image,
+                profileImage,
                 role: "USER",
                 favoriteIds: [],
                 createdAt: new Date(),
@@ -51,4 +51,4 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
         console.error("Erreur lors de l'enregistrement de l'utilisateur:", error);
         return { error: "Une erreur s'est produite lors de l'enregistrement. Veuillez réessayer." };
     }
-};
+}
