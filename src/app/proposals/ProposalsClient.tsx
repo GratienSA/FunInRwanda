@@ -10,6 +10,7 @@ import Heading from '../../components/Heading';
 import { FiEdit2, FiTrash2, FiUser } from 'react-icons/fi'; 
 import Image from 'next/image';
 
+// Définition des props du composant
 interface ProposalsClientProps {
   listings: SafeListing[];
   currentUser?: SafeUser | null;
@@ -17,10 +18,10 @@ interface ProposalsClientProps {
 
 const ProposalsClient: React.FC<ProposalsClientProps> = ({
   listings,
-  currentUser,
 }) => {
   const router = useRouter();
 
+  // Fonction pour supprimer une annonce
   const onDelete = useCallback(async (id: string) => {
     try {
       await axios.delete(`/api/listings/${id}`);
@@ -31,16 +32,19 @@ const ProposalsClient: React.FC<ProposalsClientProps> = ({
     }
   }, [router]);
 
+  // Fonction pour éditer une annonce
   const onEdit = useCallback((id: string) => {
     router.push(`/proposals/${id}/edit`);
   }, [router]);
 
+  // Fonction pour naviguer vers la page de profil
   const onProfileClick = useCallback(() => {
     router.push('/profile');
   }, [router]);
 
   return (
     <Container>
+      {/* En-tête avec titre et bouton de profil */}
       <div className="flex justify-between items-center mb-8">
         <Heading
           title="Mes Annonces"
@@ -54,14 +58,19 @@ const ProposalsClient: React.FC<ProposalsClientProps> = ({
           Mon Profil
         </button>
       </div>
+
+      {/* Grille des annonces */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {listings.length === 0 ? (
+          // Message si aucune annonce n'est trouvée
           <div className="col-span-full text-center text-gray-500 py-10">
             Aucune annonce trouvée. Commencez par en créer une !
           </div>
         ) : (
+          // Affichage des annonces
           listings.map((listing) => (
             <div key={listing.id} className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
+              {/* Image de l'annonce */}
               <div className="relative h-48">
                 <Image
                   src={listing.imageSrc[0] || '/placeholder.jpg'}
@@ -70,11 +79,13 @@ const ProposalsClient: React.FC<ProposalsClientProps> = ({
                   objectFit="cover"
                 />
               </div>
+              {/* Contenu de l'annonce */}
               <div className="p-4">
                 <h3 className="text-lg font-semibold mb-2">{listing.title}</h3>
                 <p className="text-gray-600 mb-4 truncate">{listing.description}</p>
                 <div className="flex justify-between items-center">
                   <span className="text-blue-500 font-bold">{listing.price}€</span>
+                  {/* Boutons d'édition et de suppression */}
                   <div className="flex space-x-2">
                     <button
                       onClick={() => onEdit(listing.id)}

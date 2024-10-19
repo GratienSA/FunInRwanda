@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react'
 
 interface AvatarProps {
     userId?: string;
-    src?: string;
+    src?: string | null;
     size?: number;
     className?: string;
 }

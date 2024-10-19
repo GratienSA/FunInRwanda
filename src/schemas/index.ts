@@ -64,3 +64,5 @@ export const RegisterSchema = z.object({
   }),
   profileImage: z.string().optional().nullable(),
 });
+
+export type RegisterFormValues = z.infer<typeof RegisterSchema>;

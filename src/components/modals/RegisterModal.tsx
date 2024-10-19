@@ -25,6 +25,7 @@ const RegisterModal = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [profileImage, setProfileImage] = useState<string | null>(null)
 
+    // Configuration du formulaire avec react-hook-form et zod pour la validation
     const {
         register: registerField,
         handleSubmit,
@@ -39,9 +40,8 @@ const RegisterModal = () => {
         },
     })
 
-    const handleImageUpload = async (
-        e: React.ChangeEvent<HTMLInputElement>
-    ) => {
+    // Gestion de l'upload d'image
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (file) {
             const formData = new FormData()
@@ -68,6 +68,7 @@ const RegisterModal = () => {
         }
     }
 
+    // Gestion de la soumission du formulaire
     const onSubmit: SubmitHandler<RegisterFormValues> = async (data) => {
         setIsLoading(true)
 
@@ -93,11 +94,13 @@ const RegisterModal = () => {
         }
     }
 
+    // Fonction pour basculer entre les modales d'inscription et de connexion
     const toggle = useCallback(() => {
         registerModal.onClose()
         loginModal.onOpen()
     }, [registerModal, loginModal])
 
+    // Contenu du corps de la modale
     const bodyContent = (
         <div className="flex flex-col gap-4">
             <Heading
@@ -156,6 +159,7 @@ const RegisterModal = () => {
         </div>
     )
 
+    // Contenu du pied de la modale
     const footerContent = (
         <div className="flex flex-col gap-4 mt-3">
             <hr />
@@ -179,6 +183,7 @@ const RegisterModal = () => {
         </div>
     )
 
+    // Rendu de la modale
     return (
         <Modal
             disabled={isLoading}
@@ -193,4 +198,4 @@ const RegisterModal = () => {
     )
 }
 
-export default RegisterModal;
+export default RegisterModal

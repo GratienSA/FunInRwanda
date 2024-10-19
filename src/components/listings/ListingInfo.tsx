@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic';
 import { SafeUser } from '@/src/types';
 import useCountryData from '@/src/hooks/useCountryData';
 
+// Chargement dynamique du composant Map
 const Map = dynamic(() => import('../Map'), {
     ssr: false
 });
@@ -57,27 +58,30 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
     const coordinates = getByValue(locationName)?.latlng || [latitude, longitude];
 
     return (
-        <div className="col-span-4 flex flex-col gap-8">
+        <section className="col-span-4 flex flex-col gap-8" aria-label="Informations sur l'annonce">
             <div className="flex flex-col gap-2">
-                <div className="text-xl font-semibold flex flex-row items-center gap-2">
-                    <div>Proposed by {user?.name}</div>
-                    <Avatar src={user?.image} />
-                </div>
+                {/* Informations sur l'hôte */}
+                <h2 className="text-xl font-semibold flex flex-row items-center gap-2">
+                    Proposé par {user?.name}
+                    <Avatar src={user?.profileImage} />
+                </h2>
                 
-                <div className="flex flex-col gap-2 font-light text-neutral-500">
-                    <div><strong>Activity Type:</strong> {activityType}</div>
-                    <div><strong>Duration:</strong> {duration} hours</div>
-                    <div><strong>Difficulty:</strong> {difficulty}</div>
-                    <div><strong>Participants:</strong> {minParticipants} - {maxParticipants}</div>
-                    <div><strong>Age Restriction:</strong> {ageRestriction || 'None'}</div>
-                    <div><strong>Equipment:</strong> {equipment.join(', ')}</div>
-                    <div><strong>Location:</strong> {locationName}, {locationAddress}</div>
-                    <div><strong>Instant Book:</strong> {isInstantBook ? 'Yes' : 'No'}</div>
-                    <div><strong>Cancellation Policy:</strong> {cancellationPolicy}</div>
-                </div>
+                {/* Détails de l'activité */}
+                <dl className="flex flex-col gap-2 font-light text-neutral-500">
+                    <div><dt className="inline font-semibold">Type d'activité :</dt> <dd className="inline">{activityType}</dd></div>
+                    <div><dt className="inline font-semibold">Durée :</dt> <dd className="inline">{duration} heures</dd></div>
+                    <div><dt className="inline font-semibold">Difficulté :</dt> <dd className="inline">{difficulty}</dd></div>
+                    <div><dt className="inline font-semibold">Participants :</dt> <dd className="inline">{minParticipants} - {maxParticipants}</dd></div>
+                    <div><dt className="inline font-semibold">Restriction d'âge :</dt> <dd className="inline">{ageRestriction || 'Aucune'}</dd></div>
+                    <div><dt className="inline font-semibold">Équipement :</dt> <dd className="inline">{equipment.join(', ')}</dd></div>
+                    <div><dt className="inline font-semibold">Lieu :</dt> <dd className="inline">{locationName}, {locationAddress}</dd></div>
+                    <div><dt className="inline font-semibold">Réservation instantanée :</dt> <dd className="inline">{isInstantBook ? 'Oui' : 'Non'}</dd></div>
+                    <div><dt className="inline font-semibold">Politique d'annulation :</dt> <dd className="inline">{cancellationPolicy}</dd></div>
+                </dl>
 
                 <hr />
 
+                {/* Catégorie de l'annonce */}
                 {category && category.icon && (
                     <ListingCategory
                         icon={category.icon}
@@ -88,15 +92,19 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
 
                 <hr />
 
-                <div className="text-lg font-light text-neutral-500">
+                {/* Description de l'annonce */}
+                <h3 className="sr-only">Description</h3>
+                <p className="text-lg font-light text-neutral-500">
                     {description}
-                </div>
+                </p>
 
                 <hr />
 
+                {/* Carte de localisation */}
+                <h3 className="sr-only">Localisation</h3>
                 <Map center={coordinates} />
             </div>
-        </div>
+        </section>
     );
 };
 

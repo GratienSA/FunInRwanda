@@ -10,6 +10,7 @@ import Heading from "../../components/Heading";
 import ListingCard from "../../components/listings/ListingCard";
 import { SafeBooking, SafeUser } from "../../types";
 
+// Définition des props du composant
 interface BookingsClientProps {
   bookings: SafeBooking[];
   currentUser?: SafeUser | null;
@@ -20,22 +21,24 @@ const BookingsClient: React.FC<BookingsClientProps> = ({
   currentUser
 }) => {
   const router = useRouter();
+  // État pour suivre l'ID de la réservation en cours d'annulation
   const [deletingId, setDeletingId] = useState('');
 
+  // Fonction pour annuler une réservation
   const onCancel = useCallback((id: string) => {
     setDeletingId(id);
 
     axios.delete(`/api/reservations/${id}`)
       .then(() => {
         toast.success("Booking cancelled");
-        router.refresh();
+        router.refresh(); // Rafraîchit la page pour mettre à jour les données
       })
       .catch((error) => {
-        
+        // Affiche un message d'erreur personnalisé ou par défaut
         toast.error(error?.response?.data?.message || "Error cancelling booking");
       })
       .finally(() => {
-        setDeletingId('');
+        setDeletingId(''); // Réinitialise l'ID de suppression
       });
   }, [router]);
 

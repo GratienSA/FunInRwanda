@@ -14,16 +14,20 @@ import ListingInfo from '../../../components/listings/ListingInfo';
 import ListingBooking from '../../../components/listings/ListingBooking';
 import ListingHead from "../../../components/listings/ListingHead";
 
+// Définition de la plage de dates initiale
 const initialDateRange = {
     startDate: new Date(),
     endDate: new Date(),
     key: 'selection',
 };
 
+// Interface pour les props du composant
 interface ListingClientProps {
-    bookings?: SafeBooking[];
-    listing: SafeListing;
+    listing: SafeListing & {
+      user: SafeUser;
+    };
     currentUser?: SafeUser | null;
+    bookings?: SafeBooking[];
 }
 
 const ListingClient: React.FC<ListingClientProps> = ({
@@ -34,6 +38,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
     const loginModal = useLoginModal();
     const router = useRouter(); 
 
+    // Calcul des dates désactivées pour la réservation
     const disabledDates = useMemo(() => {
         let dates: Date[] = [];
     
@@ -56,6 +61,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
     const [totalPrice, setTotalPrice] = useState(listing.price);
     const [dateRange, setDateRange] = useState<Range>(initialDateRange);
 
+    // Fonction pour créer une réservation
     const onCreateBooking = useCallback(async () => {
         if (!currentUser) {
             return loginModal.onOpen();
@@ -69,20 +75,21 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 endDate: dateRange.endDate,
                 listingId: listing.id,
             });
-            toast.success('Activity reserved!');
+            toast.success('Activité réservée !');
             setDateRange(initialDateRange);
             router.push('/reservations');
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                toast.error(error.response?.data?.error || 'Something went wrong.');
+                toast.error(error.response?.data?.error || 'Une erreur est survenue.');
             } else {
-                toast.error('An unexpected error occurred.');
+                toast.error('Une erreur inattendue est survenue.');
             }
         } finally {
             setIsLoading(false);
         }
     }, [totalPrice, dateRange, listing?.id, router, currentUser, loginModal]);
 
+    // Mise à jour du prix total lors du changement de dates
     useEffect(() => {
         if (dateRange.startDate && dateRange.endDate) {
             const dayCount = differenceInCalendarDays(
@@ -98,6 +105,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
         }
     }, [dateRange, listing.price]);
 
+    // Récupération de la catégorie de l'activité
     const category = useMemo(() => {
         return categories.find((items) => items.label === listing.category);
     }, [listing.category]);

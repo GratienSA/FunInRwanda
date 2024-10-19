@@ -8,6 +8,7 @@ interface CountryData {
   region: string;
   latlng: [number, number];
   capital: string;
+
 }
 
 interface RegionData {

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
-import { SafeListing, SafeUser } from '@/src/types';
+import { BookingFormData, SafeListing, SafeUser } from '@/src/types';
 import Container from '@/src/components/Container';
 import ClientOnly from '@/src/components/navbar/ClientOnly';
 import EmptyState from '@/src/components/EmptyState';
@@ -28,7 +28,12 @@ const EditProposalPage = ({ params }: { params: IParams }) => {
         setListing(response.data.listing);
         setUser(response.data.user);
       } catch (error) {
-        toast.error("Erreur lors du chargement de l'annonce");
+        toast.error("Erreur lors du chargement de l'annonce", {
+          ariaProps: {
+            role: 'status',
+            'aria-live': 'polite',
+          },
+        });
       } finally {
         setIsLoading(false);
       }
@@ -37,13 +42,32 @@ const EditProposalPage = ({ params }: { params: IParams }) => {
     fetchListing();
   }, [params.id]);
 
-  const handleSubmit = async (updatedListing: SafeListing) => {
+  const handleSubmit = async (formData: BookingFormData) => {
+    if (!listing) return;
+
     try {
+      const updatedListing: SafeListing = {
+        ...listing,
+        ...formData,
+        id: listing.id,
+        createdAt: listing.createdAt,
+        userId: listing.userId,
+      };
       await axios.put(`/api/listings/${params.id}`, updatedListing);
-      toast.success("Annonce mise à jour avec succès");
+      toast.success("Annonce mise à jour avec succès", {
+        ariaProps: {
+          role: 'status',
+          'aria-live': 'polite',
+        },
+      });
       router.push(`/proposals/${params.id}`);
     } catch (error) {
-      toast.error("Erreur lors de la mise à jour de l'annonce");
+      toast.error("Erreur lors de la mise à jour de l'annonce", {
+        ariaProps: {
+          role: 'status',
+          'aria-live': 'polite',
+        },
+      });
     }
   };
 
@@ -51,7 +75,7 @@ const EditProposalPage = ({ params }: { params: IParams }) => {
     return (
       <ClientOnly>
         <Container>
-          <div>Chargement...</div>
+          <div role="status" aria-live="polite">Chargement...</div>
         </Container>
       </ClientOnly>
     );
@@ -75,10 +99,9 @@ const EditProposalPage = ({ params }: { params: IParams }) => {
           title="Modifier l'annonce"
           subtitle="Apportez des modifications à votre annonce"
         />
-        <EditListingForm 
-          listing={listing} 
-          onSubmit={handleSubmit} 
-        />
+        <div className="max-w-2xl mx-auto">
+          <EditListingForm listing={listing} onSubmit={handleSubmit} />
+        </div>
       </Container>
     </ClientOnly>
   );
