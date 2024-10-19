@@ -22,7 +22,7 @@ import { Button } from '@/src/components/ui/button'
 
 
 const SettingsPage = () => {
-    const user = useCurrentUser()
+    const { user } = useCurrentUser()
 
     const [error, setError] = useState<string | undefined>()
     const [success, setSuccess] = useState<string | undefined>()
@@ -40,7 +40,7 @@ const SettingsPage = () => {
             isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined,
         },
     })
-
+    
     const onSubmit = (values: z.infer<typeof SettingsSchema>) => {
         startTransition(() => {
             settings(values)
