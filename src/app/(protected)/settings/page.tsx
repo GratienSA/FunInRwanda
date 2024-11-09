@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useTransition, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useCurrentUser } from '@/src/hooks/useCurrentUser'
-import { SettingsSchema } from '@/src/schemas'
 import { settings, updateUserRole } from '@/src/actions/settings'
 import { Card, CardContent, CardHeader } from '@/src/components/ui/card'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/src/components/ui/form'
@@ -18,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/src/components/ui/switch'
 import { Button } from '@/src/components/ui/button'
 import bcrypt from 'bcryptjs'; 
+import { SettingsSchema } from '@/src/schemas'
 
 
 const SettingsPage = () => {

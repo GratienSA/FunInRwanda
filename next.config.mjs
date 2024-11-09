@@ -24,6 +24,7 @@ const nextConfig = {
     ],
   },
   webpack: (config, { isServer }) => {
+    config.resolve.alias['@'] = path.resolve(__dirname, './');
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
