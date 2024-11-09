@@ -1,6 +1,6 @@
+import prismadb from '@/lib/prismadb';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import prismadb from '@/src/lib/prismadb';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';

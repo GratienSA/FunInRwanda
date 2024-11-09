@@ -14,10 +14,11 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".",
+    "baseUrl": ".",  // This can stay as is
     "types": ["jest", "node"],
+    // Adjusting paths to target the src directory
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["src/*"]
     },
     "plugins": [
       {
@@ -25,15 +26,19 @@
       }
     ]
   },
+  // Ensure that your include section covers all necessary files
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
     "middleware.ts",
-    "src/app/dashboard",
+    // Ensure this includes all necessary src directories
+    "src/**/*", 
+    // You can keep specific paths if needed
     "cloudinary.d.ts",
     "src/__tests__/api"
   ],
+  // Exclude node_modules as before
   "exclude": ["node_modules"]
 }

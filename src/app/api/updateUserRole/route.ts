@@ -1,4 +1,5 @@
-import { updateUserRole } from '@/src/actions/settings';
+
+import { updateUserRole } from '@/actions/settings';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 
