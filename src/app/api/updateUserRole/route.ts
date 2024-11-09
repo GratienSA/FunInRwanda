@@ -1,24 +1,22 @@
-
 import { updateUserRole } from '@/actions/settings';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 
+export async function POST(req: Request) {
+  const { userId, newRole } = await req.json();
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
-    const { userId, newRole } = req.body;
-
-    try {
-      const updatedUser = await updateUserRole(userId, newRole);
-      return res.status(200).json(updatedUser);
-    } catch (error) {
-      // Vérifier si l'erreur est bien une instance de Error
-      if (error instanceof Error) {
-        return res.status(500).json({ error: 'Erreur lors de la mise à jour du rôle', details: error.message });
-      }
-      // Si ce n'est pas une instance d'Error, renvoyer un message générique
-      return res.status(500).json({ error: 'Erreur inconnue lors de la mise à jour du rôle' });
+  try {
+    const updatedUser = await updateUserRole(userId, newRole);
+    return NextResponse.json(updatedUser, { status: 200 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: 'Erreur lors de la mise à jour du rôle', details: error.message },
+        { status: 500 }
+      );
     }
+    return NextResponse.json(
+      { error: 'Erreur inconnue lors de la mise à jour du rôle' },
+      { status: 500 }
+    );
   }
-
-  return res.status(405).json({ error: 'Méthode non autorisée' });
 }
