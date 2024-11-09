@@ -128,7 +128,7 @@ export const updateUser = async (userData: UserData) => {
 
 // Fonction pour mettre à jour le rôle d'un utilisateur
 export const updateUserRole = async (userId: string, newRole: UserRole) => { 
-  const validRoles = ['USER', 'ADMIN'] as const; // Utiliser 'as const' pour définir des rôles valides
+  const validRoles = ['USER', 'ADMIN'] as const; 
   if (!validRoles.includes(newRole)) {
     throw new Error("Rôle invalide");
   }
