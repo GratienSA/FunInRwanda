@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -7,14 +7,14 @@ import getListingById from "@/actions/getListingById";
 import EmptyState from "@/components/EmptyState";
 import ClientOnly from "@/components/navbar/ClientOnly";
 import ListingClient from "./ListingClient";
-import { SafeListing, SafeBooking } from "@/types"; 
+import { SafeListing, SafeBooking } from "@/types";
 
 // Définition de l'interface pour les paramètres
 interface IParams {
   listingId: string;
 }
 
-const ListingPage = ({ params }: { params: IParams }) => {
+const ListingDetailsPage = async ({ params }: { params: IParams }) => {
   // États pour gérer les données et le chargement
   const [listing, setListing] = useState<SafeListing | null>(null);
   const [bookings, setBookings] = useState<SafeBooking[]>([]);
@@ -32,7 +32,7 @@ const ListingPage = ({ params }: { params: IParams }) => {
         const fetchedListing = await getListingById(params);
         const fetchedBookings = await getBookings(params);
         setListing(fetchedListing);
-        setBookings(fetchedBookings.bookings || []); 
+        setBookings(fetchedBookings.bookings || []);
       } catch (error) {
         console.error("Erreur lors de la récupération des données:", error);
         // TODO: Ajouter une gestion d'erreur plus robuste ici
@@ -81,4 +81,4 @@ const ListingPage = ({ params }: { params: IParams }) => {
   );
 };
 
-export default ListingPage;
+export default ListingDetailsPage;
