@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTransition, useState } from 'react'
 import { useSession } from 'next-auth/react'
-import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { settings, updateUserRole } from '@/actions/settings'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -18,6 +17,7 @@ import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import bcrypt from 'bcryptjs'; 
 import { SettingsSchema } from '@/schemas'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 
 const SettingsPage = () => {
