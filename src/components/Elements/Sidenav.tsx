@@ -4,7 +4,6 @@ import Logo from '../navbar/Logo'
 import { PowerIcon } from 'lucide-react'
 import { Button } from '../ui/button'
 import NavLinks from './NavLink'
-import ModeToggle from '../dashboard/ModeToggle'
 import { logout } from '@/src/actions/logout'
 
 
@@ -21,7 +20,7 @@ export default function SideNav() {
         <div className="h-auto w-full grow rounded-md md:block"></div>
 
         <div className="flex md:flex-col ">
-          <ModeToggle />
+         
           <form
             action={logout}
           >

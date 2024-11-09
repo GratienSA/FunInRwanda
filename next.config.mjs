@@ -38,6 +38,12 @@ const nextConfig = {
       };
     }
 
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'mongodb-client-encryption': false,
+      'aws4': false,
+    };
+
     config.module.rules.push({
       test: /\.html$/,
       loader: 'ignore-loader'

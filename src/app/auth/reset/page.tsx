@@ -6,10 +6,10 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useUser } from '@auth0/nextjs-auth0/client';
 import Button from "../../../components/navbar/Button";
 import Input from "../../../components/inputs/Input";
 import Heading from "../../../components/Heading";
-
 
 // Define a schema for password reset
 const ResetSchema = z.object({
@@ -18,7 +18,8 @@ const ResetSchema = z.object({
 
 const ResetPage = () => {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const { user, error, isLoading } = useUser();
   
   const { 
     register, 
@@ -32,19 +33,34 @@ const ResetPage = () => {
   });
 
   const onSubmit: SubmitHandler<z.infer<typeof ResetSchema>> = async (data) => {
-    setIsLoading(true);
+    setIsResetting(true);
     
     try {
-       await resetPassword(data.email);
-      
-      toast.success("Password reset email sent. Please check your inbox.");
-      router.push('/login'); 
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.email })
+      });
+
+      if (response.ok) {
+        toast.success("Password reset email sent. Please check your inbox.");
+        router.push('/login');
+      } else {
+        throw new Error('Failed to send reset email');
+      }
     } catch (error) {
       toast.error("Failed to send reset email. Please try again.");
     } finally {
-      setIsLoading(false);
+      setIsResetting(false);
     }
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>{error.message}</div>;
+  if (user) {
+    router.push('/profile'); // Redirect to profile if user is already logged in
+    return null;
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -58,14 +74,14 @@ const ResetPage = () => {
             id="email"
             label="Email"
             type="email"
-            disabled={isLoading}
+            disabled={isResetting}
             register={register}
             errors={errors}
             required
           />
           <Button
-            disabled={isLoading}
-            label={isLoading ? "Sending..." : "Send Reset Link"}
+            disabled={isResetting}
+            label={isResetting ? "Sending..." : "Send Reset Link"}
             onClick={handleSubmit(onSubmit)}
           />
         </form>

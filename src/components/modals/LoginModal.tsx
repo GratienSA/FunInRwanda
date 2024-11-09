@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { signIn } from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
@@ -40,29 +40,26 @@ const LoginModal = () => {
         setIsLoading(true);
         
         try {
-            // Appel de la fonction login du serveur
             const result = await login(data);
             
             if (result.success) {
-                // Si la connexion réussit côté serveur, procédez à la connexion côté client
                 const signInResult = await signIn("credentials", {
                     ...data,
                     redirect: false
                 });
 
                 if (signInResult?.ok) {
-                    toast.success("Logged in successfully");
+                    toast.success("Connexion réussie");
                     router.refresh();
                     loginModal.onClose();
                 } else {
-                    toast.error("Failed to sign in");
+                    toast.error("Échec de la connexion");
                 }
             } else {
-                // Si la validation échoue côté serveur
-                toast.error(result.error || "Invalid credentials");
+                toast.error(result.error || "Identifiants invalides");
             }
         } catch (error) {
-            toast.error("An error occurred");
+            toast.error("Une erreur est survenue");
         } finally {
             setIsLoading(false);
         }
@@ -76,8 +73,8 @@ const LoginModal = () => {
     const bodyContent = (
         <div className="flex flex-col gap-4">
             <Heading 
-                title="Welcome back"
-                subtitle="Login to your account!"
+                title="Bienvenue sur FunInRwanda"
+                subtitle="Connectez-vous à votre compte !"
             />
             <Input
                 id="email"
@@ -90,7 +87,7 @@ const LoginModal = () => {
             />
             <Input
                 id="password"
-                label="Password"
+                label="Mot de passe"
                 type="password"
                 disabled={isLoading}
                 register={register}
@@ -105,18 +102,18 @@ const LoginModal = () => {
             <hr />
             <Button 
                 outline 
-                label="Continue with Google"
+                label="Continuer avec Google"
                 icon={FcGoogle}
                 onClick={() => signIn('google')}
             />
             <div className="text-neutral-500 text-center mt-4 font-light">
                 <div className="justify-center flex flex-row items-center gap-2">
-                    <div>First time using FunInRwanda?</div>
+                    <div>Première visite sur FunInRwanda ?</div>
                     <div 
                         onClick={toggle} 
                         className="text-neutral-800 cursor-pointer hover:underline"
                     >
-                        Create an account
+                        Créer un compte
                     </div>
                 </div>
             </div>
@@ -127,8 +124,8 @@ const LoginModal = () => {
         <Modal
             disabled={isLoading}
             isOpen={loginModal.isOpen}
-            title="Login"
-            actionLabel="Continue"
+            title="Connexion"
+            actionLabel="Continuer"
             onClose={loginModal.onClose}
             onSubmit={handleSubmit(onSubmit)}
             body={bodyContent}

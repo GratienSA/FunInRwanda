@@ -35,7 +35,7 @@ export const generateTwoFactorToken = async (email: string) => {
 
 export const generatePasswordResetToken = async (email: string) => {
   const token = uuidv4();
-  const expires = new Date(new Date().getTime() + 3600 * 1000);
+  const expire = new Date(new Date().getTime() + 3600 * 1000);
 
   const existingToken = await getPasswordResetTokenByEmail(email);
 
@@ -49,7 +49,7 @@ export const generatePasswordResetToken = async (email: string) => {
     data: {
       email,
       token,
-      expires,
+      expire,
     },
   });
 
@@ -82,8 +82,8 @@ export const generateVerificationToken = async (email: string) => {
 }
 
 // Fonction utilitaire pour vérifier si un token a expiré
-export const isTokenExpired = (expires: Date): boolean => {
-  return new Date() > new Date(expires);
+export const isTokenExpired = async (expiryDate: Date): Promise<boolean> => {
+  return new Date() > new Date(expiryDate);
 }
 
 // Fonction pour obtenir un token de vérification par son token

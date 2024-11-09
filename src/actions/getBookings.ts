@@ -1,10 +1,11 @@
 "use server";
 
 import prismadb from "../lib/prismadb";
-import { ReceivedBooking, SafeBooking, SafeListing, SafeUser } from "../types";
+import {SafeBooking, SafeListing, SafeUser } from "../types";
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
+import { Prisma, UserRole } from "@prisma/client";
 
 interface IParams {
     listingId?: string;
@@ -107,7 +108,7 @@ type CardData = {
   };
   
 
-export async function fetchCardData(): Promise<CardData> {
+  export async function fetchCardData(): Promise<CardData> {
     try {
       const safeSum = (value: number | null | undefined) => value ?? 0;
   
@@ -145,26 +146,24 @@ export async function fetchCardData(): Promise<CardData> {
       };
     } catch (error) {
       console.error('Database Error:', error);
-      throw new Error(`Failed to fetch card data: ${error.message}`);
+      throw new Error('Failed to fetch card data: ' + (error instanceof Error ? error.message : String(error)));
     }
   }
-  
 
-  export async function fetchLatestBookings(): Promise<ReceivedBooking[]> {
+
+
+
+export async function fetchLatestBookings(): Promise<ReceivedBooking[]> {
     try {
         const latestBookings = await prismadb.booking.findMany({
             include: {
-                user: { 
-                    select: { 
-                        name: true, 
-                        image: true, 
-                        email: true 
-                    } 
-                },
-                listing: { 
-                    select: { 
-                        title: true 
-                    } 
+                user: true,
+                listing: {
+                    include: {
+                        user: true,
+                        bookings: true,
+                        reviews: true
+                    }
                 }
             },
             orderBy: { createdAt: 'desc' },
@@ -182,12 +181,51 @@ export async function fetchCardData(): Promise<CardData> {
             updatedAt: booking.updatedAt,
             status: booking.status,
             user: {
+                id: booking.user.id,
                 name: booking.user.name,
                 email: booking.user.email,
-                image: booking.user.image
+                emailVerified: booking.user.emailVerified,
+                createdAt: booking.user.createdAt,
+                updatedAt: booking.user.updatedAt,
+                role: booking.user.role as UserRole,
+                profileImage: booking.user.profileImage,
+                favoriteIds: booking.user.favoriteIds,
+                isTwoFactorEnabled: booking.user.isTwoFactorEnabled,
+                isOAuth: booking.user.isOAuth,
+                hashedPassword: booking.user.hashedPassword
             },
             listing: {
-                title: booking.listing.title
+                id: booking.listing.id,
+                title: booking.listing.title,
+                createdAt: booking.listing.createdAt,
+                updatedAt: booking.listing.updatedAt,
+                user: {
+                    id: booking.listing.user.id,
+                    name: booking.listing.user.name,
+                    email: booking.listing.user.email,
+                    emailVerified: booking.listing.user.emailVerified,
+                    createdAt: booking.listing.user.createdAt,
+                    updatedAt: booking.listing.user.updatedAt,
+                    role: booking.listing.user.role as UserRole,
+                    profileImage: booking.listing.user.profileImage,
+                    favoriteIds: booking.listing.user.favoriteIds,
+                    isTwoFactorEnabled: booking.listing.user.isTwoFactorEnabled,
+                    isOAuth: booking.listing.user.isOAuth,
+                  
+                },
+                bookings: booking.listing.bookings.map(b => ({
+                    id: b.id,
+                    startDate: b.startDate,
+                    endDate: b.endDate,
+                    createdAt: b.createdAt,
+                    updatedAt: b.updatedAt,
+                    status: b.status
+                })),
+                reviews: booking.listing.reviews.map(r => ({
+                    id: r.id,
+                    createdAt: r.createdAt,
+                    updatedAt: r.updatedAt
+                }))
             }
         }));
     } catch (error) {
@@ -206,55 +244,107 @@ export async function deleteBooking(id: string) {
     }
 }
 
-export async function fetchFilteredBookings(query: string, currentPage: number): Promise<(ReceivedBooking | null)[]> {
+// Définissez un type partiel pour User
+type PartialUser = Partial<{
+    id: string;
+    name: string | null;
+    email: string | null;
+    emailVerified: Date | null;
+    hashedPassword: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    role: UserRole;
+    profileImage: string | null;
+    favoriteIds: string[];
+    isTwoFactorEnabled: boolean;
+    isOAuth: boolean;
+}>;
 
-    try {
-    
-        const bookings = await prismadb.booking.findMany({
-            include: {
-              user: true,
-              listing: true,
-            },
-          });
-          
+// Définissez un type partiel pour Listing
+type PartialListing = Partial<{
+    id: string;
+    title: string;
+    createdAt: Date;
+    updatedAt: Date;
+    user: PartialUser;
+    bookings: Array<{
+        id: string;
+        startDate: Date;
+        endDate: Date;
+        createdAt: Date;
+        updatedAt: Date;
+        status: string;
+    }>;
+    reviews: Array<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+}>;
 
-        console.log('Bookings fetched:', bookings);
+// Modifiez le type ReceivedBooking pour utiliser ces types partiels
+type ReceivedBooking = {
+    id: string;
+    userId: string;
+    listingId: string;
+    startDate: Date;
+    endDate: Date;
+    totalPrice: number;
+    createdAt: Date;
+    updatedAt: Date;
+    status: string;
+    user: PartialUser;
+    listing: PartialListing;
+};
 
-        if (!Array.isArray(bookings)) {
-            throw new Error('Unexpected response format from database');
-        }
 
-        return bookings.map((booking: any): ReceivedBooking | null => {
-            if (!booking.user || !booking.listing) {
-                console.warn('Booking with missing user or listing:', booking);
-                return null;
-            }
+export async function fetchFilteredBookings(query: string, currentPage: number): Promise<ReceivedBooking[]> {
+  const ITEMS_PER_PAGE = 6;
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-            return {
-                id: booking.id,
-                userId: booking.userId,
-                listingId: booking.listingId,
-                startDate: new Date(booking.startDate.$date),
-                endDate: new Date(booking.endDate.$date),
-                totalPrice: booking.totalPrice,
-                createdAt: new Date(booking.createdAt.$date),
-                updatedAt: new Date(booking.updatedAt.$date),
-                status: booking.status,
-                user: {
-                    name: booking.user.name,
-                    email: booking.user.email,
-                    image: booking.user.image,
-                },
-                listing: {
-                    title: booking.listing.title,
-                },
-            };
-        });
+  try {
+    const bookings = await prismadb.booking.findMany({
+      where: {
+        OR: [
+          { user: { name: { contains: query, mode: 'insensitive' } } },
+          { listing: { title: { contains: query, mode: 'insensitive' } } },
+          { status: { contains: query, mode: 'insensitive' } },
+        ],
+      },
+      include: {
+        user: true,
+        listing: {
+          include: {
+            user: true,
+            bookings: true,
+            reviews: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: offset,
+      take: ITEMS_PER_PAGE,
+    });
 
-    } catch (error) {
-        console.error('Database Error:', error);
-        throw new Error('Failed to fetch bookings.');
-    }
+    return bookings.map((booking): ReceivedBooking => ({
+      ...booking,
+      startDate: booking.startDate ?? new Date(),
+      endDate: booking.endDate ?? new Date(),
+      listing: {
+        ...booking.listing,
+        bookings: booking.listing.bookings.map(b => ({
+          ...b,
+          startDate: b.startDate ?? new Date(),
+          endDate: b.endDate ?? new Date(),
+        })),
+      },
+    }));
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch bookings.');
+  }
 }
        
 export async function fetchBookingsPages(query: string) {
@@ -305,43 +395,48 @@ export type State = {
     };
   };
 
-export async function createBooking(formData: FormData) {
+  export async function createBooking(prevState: State, formData: FormData): Promise<State> {
     const validatedFields = CreateBooking.safeParse({
-        userId: formData.get('userId'),
-        listingId: formData.get('listingId'),
-        totalPrice: formData.get('totalPrice'),
-        startDate: formData.get('startDate'),
-        endDate: formData.get('endDate'),
+      userId: formData.get('userId'),
+      listingId: formData.get('listingId'),
+      totalPrice: formData.get('totalPrice'),
+      startDate: formData.get('startDate'),
+      endDate: formData.get('endDate'),
     });
-
+  
     if (!validatedFields.success) {
-        return {
-            errors: validatedFields.error.flatten().fieldErrors,
-            message: 'Missing Fields. Failed to Create Booking.',
-        };
+      return {
+        message: 'Missing Fields. Failed to Create Booking.',
+        errors: validatedFields.error.flatten().fieldErrors,
+      };
     }
-
+  
     const { userId, listingId, totalPrice, startDate, endDate } = validatedFields.data;
     const totalPriceInCents = totalPrice * 100;
-
+  
     try {
-        await prismadb.booking.create({
-            data: {
-                userId,
-                listingId,
-                totalPrice: totalPriceInCents,
-                startDate,
-                endDate,
-            }
-        });
+      await prismadb.booking.create({
+        data: {
+          userId,
+          listingId,
+          totalPrice: totalPriceInCents,
+          startDate,
+          endDate,
+        }
+      });
+  
+      revalidatePath('/dashboard/bookings');
+      return {
+        message: 'Booking created successfully',
+        errors: {}
+      };
     } catch (error) {
-        return {
-            message: 'Database Error: Failed to Create Booking.',
-        };
+      return {
+        message: 'Database Error: Failed to Create Booking.',
+        errors: {}
+      };
     }
-    revalidatePath('/dashboard/bookings');
-    redirect('/dashboard/bookings');
-}
+  }
 
 export async function updateBooking(
     id: string,
@@ -383,96 +478,111 @@ export async function updateBooking(
     redirect('/dashboard/bookings');
 }
 
-
 export async function fetchBookingById(id: string): Promise<SafeBooking | null> {
-    const booking = await prismadb.booking.findUnique({
-      where: { id },
-      include: {
-        user: {
-          include: {
-            accounts: true
-          }
-        },
-        listing: {
-          include: {
-            user: true,
-            bookings: {
-              include: {
-                user: true,  // Include user for each booking
-                listing: true
-              }
-            },
-            reviews: true
-          }
-        },
-      },
-    })
-  
-    if (!booking) return null
-  
-    const isOAuth = booking.user.accounts.length > 0
-  
-    const safeListing: SafeListing = {
-      ...booking.listing,
-      createdAt: booking.listing.createdAt.toISOString(),
-      updatedAt: booking.listing.updatedAt.toISOString(),
+  const booking = await prismadb.booking.findUnique({
+    where: { id },
+    include: {
       user: {
-        ...booking.listing.user,
-        createdAt: booking.listing.user.createdAt.toISOString(),
-        updatedAt: booking.listing.user.updatedAt.toISOString(),
-        emailVerified: booking.listing.user.emailVerified?.toISOString() || null,
-        isOAuth: booking.listing.user.hashedPassword === null,
-        favoriteIds: booking.listing.user.favoriteIds,
-        role: booking.listing.user.role,
-        isTwoFactorEnabled: booking.listing.user.isTwoFactorEnabled,
+        include: {
+          accounts: true
+        }
       },
-      bookings: booking.listing.bookings.map(b => ({
-        ...b,
-        createdAt: b.createdAt.toISOString(),
-        updatedAt: b.updatedAt.toISOString(),
-        startDate: b.startDate.toISOString(),
-        endDate: b.endDate.toISOString(),
-        listing: {} as SafeListing, // We'll fix this circular reference later
-        user: {
-          ...b.user,
-          createdAt: b.user.createdAt.toISOString(),
-          updatedAt: b.user.updatedAt.toISOString(),
-          emailVerified: b.user.emailVerified?.toISOString() || null,
-          isOAuth: b.user.hashedPassword === null,
-          favoriteIds: b.user.favoriteIds,
-          role: b.user.role,
-          isTwoFactorEnabled: b.user.isTwoFactorEnabled,
-        },
-      })),
-      reviews: booking.listing.reviews.map(r => ({
-        ...r,
-        createdAt: r.createdAt.toISOString(),
-        updatedAt: r.updatedAt.toISOString(),
-      })),
-    }
-  
-    
+      listing: {
+        include: {
+          user: true,
+          bookings: {
+            include: {
+              user: true,
+              listing: true
+            }
+          },
+          reviews: {
+            include: {
+              user: true
+            }
+          }
+        }
+      },
+    },
+  })
+
+  if (!booking) return null
+
+  const isOAuth = booking.user.accounts.length > 0
+
+  const safeListing: SafeListing = {
+    ...booking.listing,
+    createdAt: booking.listing.createdAt.toISOString(),
+    updatedAt: booking.listing.updatedAt.toISOString(),
+    user: {
+      ...booking.listing.user,
+      createdAt: booking.listing.user.createdAt.toISOString(),
+      updatedAt: booking.listing.user.updatedAt.toISOString(),
+      emailVerified: booking.listing.user.emailVerified?.toISOString() || null,
+      isOAuth: booking.listing.user.hashedPassword === null,
+      favoriteIds: booking.listing.user.favoriteIds,
+      role: booking.listing.user.role,
+      isTwoFactorEnabled: booking.listing.user.isTwoFactorEnabled,
+    },
+    bookings: booking.listing.bookings.map(b => ({
+      ...b,
+      createdAt: b.createdAt.toISOString(),
+      updatedAt: b.updatedAt.toISOString(),
+      startDate: b.startDate.toISOString(),
+      endDate: b.endDate.toISOString(),
+      listing: {} as SafeListing, // We'll fix this circular reference later
+      user: {
+        ...b.user,
+        createdAt: b.user.createdAt.toISOString(),
+        updatedAt: b.user.updatedAt.toISOString(),
+        emailVerified: b.user.emailVerified?.toISOString() || null,
+        isOAuth: b.user.hashedPassword === null,
+        favoriteIds: b.user.favoriteIds,
+        role: b.user.role,
+        isTwoFactorEnabled: b.user.isTwoFactorEnabled,
+      },
+    })),
+    reviews: booking.listing.reviews.map(r => ({
+      ...r,
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+      user: {
+        ...r.user,
+        createdAt: r.user.createdAt.toISOString(),
+        updatedAt: r.user.updatedAt.toISOString(),
+        emailVerified: r.user.emailVerified?.toISOString() || null,
+        isOAuth: r.user.hashedPassword === null,
+        favoriteIds: r.user.favoriteIds,
+        role: r.user.role,
+        isTwoFactorEnabled: r.user.isTwoFactorEnabled,
+      },
+      listing: null, // ou une version simplifiée de safeListing si nécessaire
+    })),
+  }
+
+  if (safeListing.bookings) {
     safeListing.bookings = safeListing.bookings.map(b => ({
       ...b,
       listing: safeListing
-    }))
-  
-    return {
-      ...booking,
-      createdAt: booking.createdAt.toISOString(),
-      updatedAt: booking.updatedAt.toISOString(),
-      startDate: booking.startDate.toISOString(),
-      endDate: booking.endDate.toISOString(),
-      listing: safeListing,
-      user: {
-        ...booking.user,
-        createdAt: booking.user.createdAt.toISOString(),
-        updatedAt: booking.user.updatedAt.toISOString(),
-        emailVerified: booking.user.emailVerified?.toISOString() || null,
-        isOAuth,
-        favoriteIds: booking.user.favoriteIds,
-        role: booking.user.role,
-        isTwoFactorEnabled: booking.user.isTwoFactorEnabled,
-      }
-    };
+    }));
   }
+
+  return {
+    ...booking,
+    createdAt: booking.createdAt.toISOString(),
+    updatedAt: booking.updatedAt.toISOString(),
+    startDate: booking.startDate.toISOString(),
+    endDate: booking.endDate.toISOString(),
+    listing: safeListing,
+    user: {
+      ...booking.user,
+      createdAt: booking.user.createdAt.toISOString(),
+      updatedAt: booking.user.updatedAt.toISOString(),
+      emailVerified: booking.user.emailVerified?.toISOString() || null,
+      isOAuth,
+      favoriteIds: booking.user.favoriteIds,
+      role: booking.user.role,
+      isTwoFactorEnabled: booking.user.isTwoFactorEnabled,
+    }
+  };
+}

@@ -9,11 +9,28 @@ export default function BookingsTable({
   bookings,
   query,
   currentPage,
+  isLoading,
+  error,
 }: {
-  bookings: ReceivedBooking[]
-  query: string
-  currentPage: number
+  bookings?: ReceivedBooking[]
+  query?: string
+  currentPage?: number
+  isLoading: boolean
+  error?: string
 }) {
+  if (isLoading) {
+    return <div>Loading bookings...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  if (!bookings || bookings.length === 0) {
+    return <div>No bookings found.</div>;
+  }
+
+
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
@@ -25,7 +42,7 @@ export default function BookingsTable({
                   <div>
                     <div className="mb-2 flex items-center">
                       <Image
-                        src={booking.user.image || '/default-avatar.png'}
+                        src={booking.user.profileImage || '/default-avatar.png'}
                         className="mr-2 rounded-full"
                         width={28}
                         height={28}
@@ -94,7 +111,7 @@ export default function BookingsTable({
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex items-center gap-3">
                       <Image
-                        src={booking.user.image || '/default-avatar.png'}
+                        src={booking.user.profileImage || '/default-avatar.png'}
                         className="rounded-full"
                         width={28}
                         height={28}

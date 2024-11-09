@@ -29,23 +29,75 @@ export async function POST(req: Request) {
     }
 
     // Création de la réservation
-    const listing = await prismadb.listing.update({
-      where: { id: listingId },
+    const newBooking = await prismadb.booking.create({
       data: {
-        bookings: {
-          create: {
-            startDate: start,
-            endDate: end,
-            totalPrice,
-            userId: user.id
+        startDate: start,
+        endDate: end,
+        totalPrice,
+        userId: user.id,
+        listingId: listingId,
+        status: "pending"
+      },
+      include: {
+        listing: {
+          select: {
+            title: true,
+            price: true
           }
         }
       }
     });
 
-    return NextResponse.json(listing);
+    console.log('New booking created:', newBooking);
+
+    return NextResponse.json({
+      id: newBooking.id,
+      startDate: newBooking.startDate,
+      endDate: newBooking.endDate,
+      totalPrice: newBooking.totalPrice,
+      listingId: newBooking.listingId,
+      listingTitle: newBooking.listing.title,
+      listingPrice: newBooking.listing.price
+    });
+
   } catch (error) {
     console.error("Error creating reservation:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+
+export async function GET(req: Request) {
+  try {
+    // Récupérer les 5 activités les plus réservées
+    const topActivities = await prismadb.listing.findMany({
+      select: {
+        id: true,
+        title: true,
+        imageSrc: true,
+        _count: {
+          select: { bookings: true }
+        }
+      },
+      orderBy: {
+        bookings: {
+          _count: 'desc'
+        }
+      },
+      take: 5
+    });
+
+    // Formater les résultats
+    const formattedTopActivities = topActivities.map(activity => ({
+      id: activity.id,
+      title: activity.title,
+      imageSrc: activity.imageSrc[0], 
+      bookingCount: activity._count.bookings
+    }));
+
+    return NextResponse.json(formattedTopActivities);
+  } catch (error) {
+    console.error("Error fetching top activities:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

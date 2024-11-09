@@ -8,20 +8,21 @@ import MenuItem from './MenuItem'
 import { useRouter } from 'next/navigation'
 import { SafeUser } from '../../types'
 import useBookingModal from '../../hooks/useBookingModal'
-import { LoginForm } from '../auth/login-form'
-import { RegisterForm } from '../auth/register-form'
+import useLoginModal from '../../hooks/useLoginModal'
+import useRegisterModal from '../../hooks/useRegisterModal'
+import { CurrentUserHookResult } from '../../hooks/useCurrentUser'
 
 interface UserMenuProps {
-    currentUser?: SafeUser | null
+    currentUser?: CurrentUserHookResult | null;
 }
 
 const UserMenu: React.FC<UserMenuProps> = () => {
     const router = useRouter()
     const { data: session, status, update } = useSession()
-    const BookingModal = useBookingModal()
+    const bookingModal = useBookingModal()
+    const loginModal = useLoginModal()
+    const registerModal = useRegisterModal()
     const [isOpen, setIsOpen] = useState(false)
-    const [showLoginForm, setShowLoginForm] = useState(false)
-    const [showRegisterForm, setShowRegisterForm] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
 
     const user = status === 'authenticated' ? (session?.user as SafeUser) : null
@@ -32,11 +33,11 @@ const UserMenu: React.FC<UserMenuProps> = () => {
 
     const onCreate = useCallback(() => {
         if (!user) {
-            setShowLoginForm(true)
+            loginModal.onOpen()
             return
         }
-        BookingModal.onOpen()
-    }, [user, BookingModal])
+        bookingModal.onOpen()
+    }, [user, bookingModal, loginModal])
 
     const handleLogout = useCallback(async () => {
         try {
@@ -67,11 +68,11 @@ const UserMenu: React.FC<UserMenuProps> = () => {
             <div className="flex flex-row items-center gap-3">
                 <div
                     onClick={onCreate}
-                    className=" bg-blue-500 hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer"
+                    className="bg-blue-500 hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer"
                     role="button"
                     tabIndex={0}
                 >
-                    Click to create Good Memories For People!
+                   Proposer votre activité!
                 </div>
                 <div
                     onClick={toggleOpen}
@@ -81,20 +82,18 @@ const UserMenu: React.FC<UserMenuProps> = () => {
                 >
                     <AiOutlineMenu />
                     <div className="hidden md:block">
-                        <div className="hidden md:block">
-                            {user ? (
-                                <Avatar
-                                    userId={user.id}
-                                    size={50}
-                                    className="border-2 border-blue-500"
-                                />
-                            ) : (
-                                <Avatar
-                                    size={50}
-                                    className="border-2 border-gray-300"
-                                />
-                            )}
-                        </div>
+                        {user ? (
+                            <Avatar
+                                userId={user.id}
+                                size={50}
+                                className="border-2 border-blue-500"
+                            />
+                        ) : (
+                            <Avatar
+                                size={50}
+                                className="border-2 border-gray-300"
+                            />
+                        )}
                     </div>
                 </div>
             </div>
@@ -103,71 +102,54 @@ const UserMenu: React.FC<UserMenuProps> = () => {
                     className="absolute rounded-xl shadow-md w-[40vw] md:w-3/4 bg-white overflow-hidden right-0 top-12 text-sm"
                     role="menu"
                 >
-                    <div className="flex flex-col cursor-pointer">
-                        {status === 'authenticated' ? (
-                            <>
-                                <MenuItem
-                                    onClick={() => router.push('/favorites')}
-                                    label="My favorites"
-                                />
-                                <MenuItem
-                                    onClick={() => router.push('/reservations')}
-                                    label="My bookings"
-                                />
-                                <MenuItem
-                                    onClick={() => router.push('/proposals')}
-                                    label="My proposals"
-                                />
-                                <MenuItem
-                                    onClick={() => router.push('/profile')}
-                                    label="My profile"
-                                />
-                                <MenuItem
-                                    onClick={BookingModal.onOpen}
-                                    label="Unforgettable Moments!"
-                                />
-                                <hr />
-                                <MenuItem
-                                    onClick={handleLogout}
-                                    label="Logout"
-                                />
-                            </>
+                <div className="flex flex-col cursor-pointer">
+    {status === 'authenticated' ? (
+        <>
+            <MenuItem
+                onClick={() => router.push('/favorites')}
+                label="Mes favoris"
+            />
+            <MenuItem
+                onClick={() => router.push('/reservations')}
+                label="Mes réservations"
+            />
+            <MenuItem
+                onClick={() => router.push('/proposals')}
+                label="Mes propositions"
+            />
+            <MenuItem
+                onClick={() => router.push('/profile')}
+                label="Mon profil"
+            />
+            <MenuItem
+                onClick={bookingModal.onOpen}
+                label="Proposer Votre activité Inoubliables !"
+            />
+            <hr />
+            <MenuItem
+                onClick={handleLogout}
+                label="Déconnexion"
+            />
+        </>
+                               
                         ) : (
                             <>
                                 <MenuItem
-                                    onClick={() => setShowLoginForm(true)}
+                                    onClick={() => {
+                                        loginModal.onOpen()
+                                        setIsOpen(false)
+                                    }}
                                     label="Login"
                                 />
                                 <MenuItem
-                                    onClick={() => setShowRegisterForm(true)}
+                                    onClick={() => {
+                                        registerModal.onOpen()
+                                        setIsOpen(false)
+                                    }}
                                     label="Sign up"
                                 />
                             </>
                         )}
-                    </div>
-                </div>
-            )}
-            {showLoginForm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg">
-                        <LoginForm
-                            onSuccess={() => router.refresh()}
-                            onClose={() => setShowLoginForm(false)}
-                        />
-                    </div>
-                </div>
-            )}
-            {showRegisterForm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg">
-                        <RegisterForm
-                            onSuccess={() =>
-                                alert(
-                                    'Please check your email to verify your account.'
-                                )
-                            }
-                            onClose={() => setShowRegisterForm(false)}
-                        />
                     </div>
                 </div>
             )}

@@ -1,8 +1,11 @@
-import { useSession } from "next-auth/react"
-
+import { useSession } from "next-auth/react";
 
 export const useCurrentRole = () => {
-    const session =useSession();
+  const { data: session, status } = useSession();
 
-    return session.data?.user?.role;
-}
+  if (status === "loading") return undefined;
+
+  console.log("Session:", session); // Log pour vérifier la session
+
+  return session?.user?.role || null; // Retourner le rôle
+};

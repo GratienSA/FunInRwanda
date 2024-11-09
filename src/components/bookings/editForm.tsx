@@ -1,24 +1,34 @@
 'use client'
 
-import {
-  CalendarIcon,
-  UserCircleIcon,
-} from 'lucide-react'
+import { CalendarIcon, UserCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useFormState } from 'react-dom'
 import { Button } from '../ui/button'
 import { State, updateBooking } from '@/src/actions/getBookings'
-import { ReceivedBooking, SafeListing, SafeUser } from '@/src/types'
+import { ExtendedReceivedBooking, SafeListing, SafeUser } from '@/src/types'
 
 interface EditBookingFormProps {
-  booking: ReceivedBooking;
+  booking: ExtendedReceivedBooking;
   users: SafeUser[];
   listings: SafeListing[];
 }
 
+const formatDate = (date: Date | string | null): string => {
+  if (date instanceof Date) {
+    return date.toISOString().split('T')[0];
+  }
+  if (typeof date === 'string') {
+    return date;
+  }
+  return ''; 
+};
+
+
 export default function EditBookingForm({ booking, users, listings }: EditBookingFormProps) {
   const initialState: State = { message: null, errors: {} }
-  const updateBookingWithId = updateBooking.bind(null, booking.id)
+  const updateBookingWithId = async (state: State, formData: FormData) => {
+    return updateBooking(booking.id, formData);
+  };
   const [state, formAction] = useFormState(updateBookingWithId, initialState)
 
   return (
@@ -77,11 +87,7 @@ export default function EditBookingForm({ booking, users, listings }: EditBookin
             id="startDate"
             name="startDate"
             type="date"
-            defaultValue={
-              booking.startDate instanceof Date 
-                ? booking.startDate.toISOString().split('T')[0] 
-                : booking.startDate || ''
-            }
+            defaultValue={formatDate(booking.startDate)}
             className="peer block w-full rounded-md border py-2 pl-10 text-sm outline-2"
           />
         </div>
@@ -95,11 +101,7 @@ export default function EditBookingForm({ booking, users, listings }: EditBookin
             id="endDate"
             name="endDate"
             type="date"
-            defaultValue={
-              booking.endDate instanceof Date 
-                ? booking.endDate.toISOString().split('T')[0] 
-                : booking.endDate || ''
-            }
+            defaultValue={formatDate(booking.endDate)}
             className="peer block w-full rounded-md border py-2 pl-10 text-sm outline-2"
           />
         </div>

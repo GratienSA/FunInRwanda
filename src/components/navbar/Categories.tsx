@@ -1,64 +1,84 @@
 "use client"
 
-import { usePathname, useSearchParams } from "next/navigation"
+import { useState } from 'react';
+import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import { FaGift, FaBirthdayCake, FaGlassCheers, FaBuilding } from 'react-icons/fa'
 import { GiPartyPopper } from 'react-icons/gi'
 import CategoryBox from "../CategoryBox"
 import Container from "../Container"
 
+// Définition de l'interface Filtres
+interface Filtres {
+  categorie: string;
+  // Ajoutez d'autres propriétés si nécessaire
+}
+
 // Définition des catégories avec leurs icônes et descriptions
 export const categories = [
     {
-        label: 'Leisure',
+        label: 'Loisirs',
         icon: GiPartyPopper,
-        description: "Fun activities for everyone"
+        description: "Activités amusantes pour tous"
     },
     {
-        label: 'Gifts',
+        label: 'Cadeaux',
         icon: FaGift,
-        description: "Perfect gift ideas"
+        description: "Idées de cadeaux parfaits"
     },
     {
-        label: 'Child birthday',
+        label: 'Anniversaire enfant',
         icon: FaBirthdayCake,
-        description: "Celebrations and activities for kids"
+        description: "Célébrations et activités pour enfants"
     },
     {
-        label: 'Bachelor/Bachelorette',
+        label: 'Enterrement de vie',
         icon: FaGlassCheers,
-        description: "Celebrate adventures and fun activities with friends."
+        description: "Célébrez des aventures et des activités amusantes entre amis"
     },
     {
-        label: 'Corporate',
+        label: 'Entreprise',
         icon: FaBuilding,
-        description: "Corporate events and team building"
+        description: "Événements d'entreprise et team building"
     }
 ]
 
 const Categories = () => {
-    // Utilisation des hooks de Next.js pour la navigation et les paramètres d'URL
+    const router = useRouter();
     const params = useSearchParams();
-    const category = params?.get('category');
+    const categorie = params?.get('categorie');
     const pathname = usePathname();
-    const isMainPage = pathname === '/';
+    const estPagePrincipale = pathname === '/';
+
+    const [filtres, setFiltres] = useState<Filtres>({
+        categorie: categorie || ''
+    });
+
+    const gererChangementFiltre = (cle: keyof Filtres, valeur: string) => {
+        setFiltres(prev => ({ ...prev, [cle]: valeur }));
+        // Mise à jour de l'URL
+        const paramsRecherche = new URLSearchParams(params);
+        paramsRecherche.set(cle, valeur);
+        router.push(`${pathname}?${paramsRecherche.toString()}`);
+    };
 
     // Ne rendre les catégories que sur la page principale
-    if (!isMainPage) {
+    if (!estPagePrincipale) {
         return null;
     }
 
     return (
         <Container>
-            {/* Conteneur principal avec gestion du scroll horizontal sur petits écrans */}
-            <nav className="py-4 md:py-8" aria-label="Category navigation">
+            {/* Conteneur principal avec gestion du défilement horizontal sur petits écrans */}
+            <nav className="py-4 md:py-8" aria-label="Navigation par catégorie">
                 <ul className="flex flex-row items-center justify-start md:justify-between overflow-x-auto space-x-4 md:space-x-8">
                     {categories.map((item) => (
                         <li key={item.label}>
                             <CategoryBox
                                 label={item.label}
-                                selected={category === item.label}
+                                selected={filtres.categorie === item.label}
                                 icon={item.icon}
                                 description={item.description}
+                                onClick={() => gererChangementFiltre('categorie', item.label)}
                             />
                         </li>
                     ))}

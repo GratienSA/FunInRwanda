@@ -3,13 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/src/app/redux/store';
 
 const FooterSection: React.FC = () => {
     const [isMounted, setIsMounted] = useState(false);
     const router = useRouter();
-    const isDark = useSelector((state: RootState) => state.theme.isDark);
+ 
 
     useEffect(() => {
         setIsMounted(true);
@@ -25,13 +23,13 @@ const FooterSection: React.FC = () => {
     ];
 
     return (
-        <footer className='bg-gray-100 dark:bg-gray-900 py-12 text-sm' aria-label="Site footer">
+        <footer className='bg-gray-100 dark:bg-gray-900 py-12 text-sm' aria-label="Ikaze Experiences">
             <div className='container mx-auto px-4'>
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
                     <div className='flex flex-col items-center sm:items-start gap-4'>
                         <Image 
                             className='h-10 w-auto' 
-                            src={isDark ? "/images/Logo-dark.png" : "/images/Logo.png"} 
+                            src="/images/Logo.png"
                             width={150} 
                             height={40} 
                             alt="Logo de IKAZE" 
@@ -87,3 +85,4 @@ const FooterSection: React.FC = () => {
 };
 
 export default FooterSection;
+

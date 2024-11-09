@@ -5,10 +5,23 @@ import { useFormState } from 'react-dom'
 import { Button } from '../ui/button'
 import { SafeListing, SafeUser } from '@/src/types'
 import { createBooking, State } from '@/src/actions/getBookings'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function BookingForm({ users, listings }: { users: SafeUser[], listings: SafeListing[] }) {
   const initialState: State = { message: null, errors: {} }
-  const [state, formAction] = useFormState(createBooking, initialState)
+  const [state, formAction] = useFormState(createBooking, initialState);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.message === 'Booking created successfully') {
+      setTimeout(() => {
+        router.push('/dashboard/bookings');
+      }, 2000); 
+    }
+  }, [state.message, router])
+
+
 
   return (
     <form action={formAction}>

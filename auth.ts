@@ -1,11 +1,10 @@
-import NextAuth from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { UserRole } from "@prisma/client"
-import authConfig from "@/auth.config"
-import prismadb from "./src/lib/prismadb"
-import { getUserById } from "./src/data/user"
-import { getTwoFactorConfirmationByUserId } from "./src/data/two-factor-confirmation"
-import { getAccountByUserId } from "./src/data/account"
+import NextAuth from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { UserRole } from "@/src/types";
+import authConfig from "@/auth.config";
+import prismadb from "./src/lib/prismadb";
+import { getUserById } from "./src/data/user";
+import { getAccountByUserId } from "./src/data/account";
 
 export const {
   handlers: { GET, POST },
@@ -44,20 +43,7 @@ export const {
             return false;
           }
 
-          if (existingUser.isTwoFactorEnabled) {
-            const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
-
-            if (!twoFactorConfirmation) {
-              console.log(`Échec de l'authentification à deux facteurs pour l'utilisateur: ${user.id}`);
-              return false;
-            }
-
-            await prismadb.twoFactorConfirmation.delete({
-              where: { id: twoFactorConfirmation.id }
-            });
-          }
-
-          return true;
+          return true; // Authentification réussie
         } catch (error) {
           console.error("Error in signIn callback:", error);
           return false;
@@ -70,12 +56,13 @@ export const {
       if (session.user) {
         session.user.id = token.sub as string;
         session.user.role = token.role as UserRole;
-        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
         session.user.name = token.name as string | null;
         session.user.email = token.email as string | null;
         session.user.isOAuth = token.isOAuth as boolean;
         session.user.favoriteIds = token.favoriteIds as string[] | undefined;
-        session.user.emailVerified = token.emailVerified ? new Date(token.emailVerified as string) : null;
+        session.user.emailVerified = token.emailVerified 
+          ? new Date(token.emailVerified as string) 
+          : null;
       }
       return session;
     },
@@ -95,8 +82,7 @@ export const {
           isOAuth: !!existingAccount,
           name: existingUser.name,
           email: existingUser.email,
-          role: existingUser.role,
-          isTwoFactorEnabled: existingUser.isTwoFactorEnabled,
+          role: existingUser.role, 
           favoriteIds: existingUser.favoriteIds,
           emailVerified: existingUser.emailVerified 
             ? existingUser.emailVerified.toISOString()
@@ -111,4 +97,4 @@ export const {
   adapter: PrismaAdapter(prismadb),
   session: { strategy: "jwt" },
   ...authConfig,
-})
+});

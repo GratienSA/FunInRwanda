@@ -33,10 +33,11 @@ export async function fetchFilteredCustomers(query: string) {
         id: true,
         name: true,
         email: true,
-        image: true,
+        profileImage: true,
         bookings: {
           select: {
             totalPrice: true,
+            status: true,
           },
         },
       },
@@ -55,7 +56,7 @@ export async function fetchFilteredCustomers(query: string) {
         id: user.id,
         name: user.name,
         email: user.email,
-        image_url: user.image,
+        image_url: user.profileImage,
         total_bookings: totalBookings,
         total_pending: formatCurrency(totalPending),
         total_paid: formatCurrency(totalPaid),

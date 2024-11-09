@@ -3,7 +3,7 @@ import { SafeUser, ExtendedUser } from "../types";
 import { UserRole } from "@prisma/client";
 
 // Définition de l'interface pour le résultat du hook
-interface CurrentUserHookResult {
+export interface CurrentUserHookResult {
   user: SafeUser | null;  // L'utilisateur actuel ou null s'il n'est pas connecté
   isLoading: boolean;     // Indique si les données de session sont en cours de chargement
 }

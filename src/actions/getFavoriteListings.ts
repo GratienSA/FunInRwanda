@@ -2,8 +2,9 @@
 
 import { auth } from "@/auth"
 import prismadb from '../lib/prismadb';
+import { SafeListing, SafeUser, SafeBooking, SafeReview } from '../types'; // Assurez-vous d'importer les types nécessaires
 
-export async function getFavoriteListings() {
+export async function getFavoriteListings(): Promise<SafeListing[]> {
   try {
     const session = await auth();
 
@@ -31,11 +32,13 @@ export async function getFavoriteListings() {
         }
       },
       include: {
-        user: true
+        user: true,
+        bookings: true,
+        reviews: true
       }
     });
 
-    const safeFavorites = favorites.map((favorite) => ({
+    const safeFavorites: SafeListing[] = favorites.map((favorite) => ({
       ...favorite,
       createdAt: favorite.createdAt.toISOString(),
       updatedAt: favorite.updatedAt.toISOString(),
@@ -44,7 +47,19 @@ export async function getFavoriteListings() {
         createdAt: favorite.user.createdAt.toISOString(),
         updatedAt: favorite.user.updatedAt.toISOString(),
         emailVerified: favorite.user.emailVerified?.toISOString() || null,
-      }
+      } as SafeUser,
+      bookings: favorite.bookings.map(booking => ({
+        ...booking,
+        createdAt: booking.createdAt.toISOString(),
+        updatedAt: booking.updatedAt.toISOString(),
+        startDate: booking.startDate.toISOString(),
+        endDate: booking.endDate.toISOString(),
+      })) as SafeBooking[],
+      reviews: favorite.reviews.map(review => ({
+        ...review,
+        createdAt: review.createdAt.toISOString(),
+        updatedAt: review.updatedAt.toISOString(),
+      })) as SafeReview[]
     }));
 
     return safeFavorites;

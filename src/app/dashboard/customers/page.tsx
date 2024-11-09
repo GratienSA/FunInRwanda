@@ -1,4 +1,4 @@
-import Search from "@/src/components/navbar/Search";
+
 import { Button } from "@/src/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { Metadata } from "next";
@@ -27,7 +27,6 @@ export default function Page({
         <h1 className="text-2xl">Customers with booking</h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <Search />
         <Button asChild>
           <Link href="/dashboard/bookings/create">
             <span className="hidden md:block">Create Booking</span>

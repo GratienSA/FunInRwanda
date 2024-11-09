@@ -17,14 +17,6 @@ export const newVerification = async (token: string) => {
 
         if (!existingToken) {
             console.log("Token not found in database");
-            
-            // Vérifiez si l'utilisateur est déjà vérifié
-            const user = await getUserByEmail(existingToken?.email);
-            if (user && user.emailVerified) {
-                console.log("Email already verified for user:", user.email);
-                return { info: "Email already verified" };
-            }
-            
             return { error: "Invalid or expired token" };
         }
 

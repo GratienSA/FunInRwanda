@@ -8,7 +8,8 @@ interface CategoryBoxProps {
     icon: IconType;
     label: string;
     selected?: boolean;
-    description: string; // Ajout de la description pour l'accessibilité
+    description: string; 
+    onClick: () => void;
 }
 
 const CategoryBox: React.FC<CategoryBoxProps> = ({

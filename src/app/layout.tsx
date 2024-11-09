@@ -4,8 +4,6 @@ import { SessionProvider } from "next-auth/react";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/navbar/Navbar";
-import LoginModal from "../components/modals/LoginModal";
-import RegisterModal from "../components/modals/RegisterModal";
 import ToasterProvider from "./providers/ToasterProvider";
 import SearchModal from "../components/modals/SearchModal";
 import ClientOnly from "../components/navbar/ClientOnly";
@@ -14,6 +12,7 @@ import { ClientProviders } from "./ClientProviders";
 import { Provider } from 'react-redux';
 import store from "./redux/store"; 
 import { useEffect, useState } from "react";
+import AuthModals from "../components/modals/AuthModals";
 
 const font = Nunito({ 
   subsets: ["latin"],
@@ -42,8 +41,7 @@ export default function RootLayout({
                   <>
                     <SearchModal />
                     <BookingModal />
-                    <LoginModal />
-                    <RegisterModal />
+                    <AuthModals />
                     <Navbar />
                   </>
                 )}

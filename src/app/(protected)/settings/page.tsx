@@ -7,7 +7,7 @@ import { useTransition, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useCurrentUser } from '@/src/hooks/useCurrentUser'
 import { SettingsSchema } from '@/src/schemas'
-import { settings } from '@/src/actions/settings'
+import { settings, updateUserRole } from '@/src/actions/settings'
 import { Card, CardContent, CardHeader } from '@/src/components/ui/card'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/src/components/ui/form'
 import { Input } from '@/src/components/ui/input'
@@ -17,46 +17,72 @@ import { UserRole } from '@prisma/client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/components/ui/select'
 import { Switch } from '@/src/components/ui/switch'
 import { Button } from '@/src/components/ui/button'
-
-
+import bcrypt from 'bcryptjs'; 
 
 
 const SettingsPage = () => {
     const { user } = useCurrentUser()
-
     const [error, setError] = useState<string | undefined>()
     const [success, setSuccess] = useState<string | undefined>()
     const { update } = useSession()
     const [isPending, startTransition] = useTransition()
 
+    const defaultValues = {
+        password: undefined,
+        newPassword: undefined,
+        name: user?.name || '',
+        email: user?.email || '',
+        role: user?.role || UserRole.USER,
+        isTwoFactorEnabled: user?.isTwoFactorEnabled || false,
+    }
+
     const form = useForm<z.infer<typeof SettingsSchema>>({
         resolver: zodResolver(SettingsSchema),
-        defaultValues: {
-            password: undefined,
-            newPassword: undefined,
-            name: user?.name || undefined,
-            email: user?.email || undefined,
-            role: user?.role || undefined,
-            isTwoFactorEnabled: user?.isTwoFactorEnabled || undefined,
-        },
+        defaultValues,
     })
-    
-    const onSubmit = (values: z.infer<typeof SettingsSchema>) => {
-        startTransition(() => {
-            settings(values)
-                .then((data) => {
-                    if (data.error) {
-                        setError(data.error)
-                    }
 
-                    if (data.success) {
-                        update()
-                        setSuccess(data.success)
-                    }
-                })
-                .catch(() => setError('Something went wrong!'))
-        })
-    }
+    const hashPassword = async (password: string): Promise<string> => {
+        const saltRounds = 10; // Adjust as necessary
+        return await bcrypt.hash(password, saltRounds);
+    };
+
+    const onSubmit = async (values: z.infer<typeof SettingsSchema>) => {
+        startTransition(async () => {
+            try {
+                // Hash the new password if provided
+                const hashedPassword = values.newPassword ? await hashPassword(values.newPassword) : undefined;
+    
+                // Prepare user data for update
+                const userData = {
+                    name: values.name,
+                    email: values.email,
+                    isTwoFactorEnabled: values.isTwoFactorEnabled,
+                    role: values.role,
+                    ...(hashedPassword && { hashedPassword }), // Only include hashedPassword if it exists
+                };
+    
+                // Call your update function (ensure it passes userData correctly)
+                const data = await settings(userData); 
+    
+                // Handle response
+                if (data.error) {
+                    setError(data.error);
+                }
+    
+                if (data.success) {
+                    update(); // Assuming this is for UI update
+                    await updateUserRole(user?.id || '', values.role); // Safely access user.id
+                    setSuccess('Role updated successfully: ' + values.role);
+                }
+            } catch (error) {
+                console.error('Error updating user:', error); // Log the error for debugging
+                setError('Something went wrong!');
+            }
+        });
+    };
+    
+    
+
 
     return (
         <Card className="w-[600px]">
@@ -166,16 +192,8 @@ const SettingsPage = () => {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem
-                                                    value={UserRole.ADMIN}
-                                                >
-                                                    Admin
-                                                </SelectItem>
-                                                <SelectItem
-                                                    value={UserRole.USER}
-                                                >
-                                                    User
-                                                </SelectItem>
+                                                <SelectItem value={UserRole.ADMIN}>Admin</SelectItem>
+                                                <SelectItem value={UserRole.USER}>User</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -193,18 +211,14 @@ const SettingsPage = () => {
                                                     Two Factor Authentication
                                                 </FormLabel>
                                                 <FormDescription>
-                                                    Enable two factor
-                                                    authentication for your
-                                                    account
+                                                    Enable two factor authentication for your account
                                                 </FormDescription>
                                             </div>
                                             <FormControl>
                                                 <Switch
                                                     disabled={isPending}
                                                     checked={field.value}
-                                                    onCheckedChange={
-                                                        field.onChange
-                                                    }
+                                                    onCheckedChange={field.onChange}
                                                 />
                                             </FormControl>
                                         </FormItem>
@@ -225,3 +239,4 @@ const SettingsPage = () => {
 }
 
 export default SettingsPage
+

@@ -68,6 +68,11 @@ const ListingCard: React.FC<ListingCardProps> = ({
     }).format(price);
   }, [price, data.currency]);
 
+  // Limiter la longueur du titre
+  const truncatedTitle = useMemo(() => {
+    const maxLength = 40; // Limite de caractères pour le titre
+    return data.title.length > maxLength ? `${data.title.substring(0, maxLength)}...` : data.title;
+  }, [data.title]);
   return (
     <div 
       onClick={() => router.push(`/listings/${data.id}`)} 
@@ -95,16 +100,16 @@ const ListingCard: React.FC<ListingCardProps> = ({
           )}
         </div>
         {/* Contenu de la carte */}
-        <div className="p-4">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">{data.title}</h2>
+        <div className="p-4  flex flex-col flex-grow">
+          <div className="flex-shrink-0 h-14"> {/* Hauteur fixe pour le titre */}
+          <h2 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">{truncatedTitle}</h2>
+          </div>
           <p className="text-sm text-gray-600 mb-2 line-clamp-2">{data.description}</p>
           {/* Section prix et évaluation */}
           <div className="flex justify-between items-end mt-4">
             <div className="text-lg font-bold text-blue-600">
               {formattedPrice}
-              <span className="text-sm font-normal text-gray-600 ml-1">
-                {!booking && "/par personne"}
-              </span>
+              
             </div>
             <div className="flex items-center">
               <FaStar className="text-yellow-400 mr-1" />

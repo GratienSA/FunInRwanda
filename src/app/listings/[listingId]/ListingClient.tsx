@@ -67,17 +67,23 @@ const ListingClient: React.FC<ListingClientProps> = ({
             return loginModal.onOpen();
         }
         setIsLoading(true);
-
+    
         try {
-            await axios.post('/api/reservations', {
+            const response = await axios.post('/api/reservations', {
                 totalPrice,
                 startDate: dateRange.startDate,
                 endDate: dateRange.endDate,
                 listingId: listing.id,
             });
-            toast.success('Activité réservée !');
-            setDateRange(initialDateRange);
-            router.push('/reservations');
+    
+            console.log('API response:', response.data);
+    
+            if (response.data.id) {
+                toast.success('Réservation créée avec succès!');
+                router.push(`/checkout/${response.data.id}/${listing.id}`);
+            } else {
+                toast.error('Impossible de créer la réservation.');
+            }
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 toast.error(error.response?.data?.error || 'Une erreur est survenue.');
@@ -87,7 +93,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
         } finally {
             setIsLoading(false);
         }
-    }, [totalPrice, dateRange, listing?.id, router, currentUser, loginModal]);
+    }, [totalPrice, dateRange, listing?.id, currentUser, router, loginModal]);
 
     // Mise à jour du prix total lors du changement de dates
     useEffect(() => {

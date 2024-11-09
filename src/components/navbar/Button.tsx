@@ -9,7 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     outline?: boolean;
     small?: boolean;
     icon?: IconType;
-    
+    fullWidth?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -19,6 +19,7 @@ const Button: React.FC<ButtonProps> = ({
     outline,
     small,
     icon: Icon,
+    fullWidth = false,
     className,
     type = "button",
     ...props
@@ -32,14 +33,14 @@ const Button: React.FC<ButtonProps> = ({
                 relative
                 disabled:opacity-70
                 disabled:cursor-not-allowed
-                rounded-lg
+                rounded-full
                 hover:opacity-80
                 transition
-                w-full
+                ${fullWidth ? 'w-full' : 'w-auto'}
                 ${outline ? 'bg-white' : 'bg-green-500'}
                 ${outline ? 'border-black' : 'border-green-500'}
                 ${outline ? 'text-black' : 'text-white'}
-                ${small ? 'py-1' : 'py-3'}
+                ${small ? 'py-2 px-4' : 'py-3 px-6'}
                 ${small ? 'text-sm' : 'text-md'}
                 ${small ? 'font-light' : 'font-semibold'}
                 ${small ? 'border-[1px]' : 'border-2'}
@@ -50,11 +51,11 @@ const Button: React.FC<ButtonProps> = ({
             {Icon && (
                 <Icon
                     size={24}
-                    className="
+                    className={`
                         absolute
                         left-4
-                        top-3
-                    "
+                        ${small ? 'top-2' : 'top-3'}
+                    `}
                 />
             )}
             {label}

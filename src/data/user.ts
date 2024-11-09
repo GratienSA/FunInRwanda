@@ -16,12 +16,29 @@ export const getUserByEmail = async (email: string) => {
   }
 };
 
+
+
 export const getUserById = async (id: string) => {
   try {
     const user = await prismadb.user.findUnique({
-      where: { id }
+      where: { id },
+      select: { 
+        id: true,
+        name: true,
+        email: true,
+        role: true, 
+        emailVerified: true,
+        favoriteIds: true,
+        hashedPassword: true,
+      },
     });
 
+    if (!user) {
+      console.warn(`Aucun utilisateur trouvé avec l'ID: ${id}`);
+      return null;
+    }
+
+   
     return user;
   } catch (error) {
     console.error("Erreur lors de la récupération de l'utilisateur par ID:", error);

@@ -12,10 +12,11 @@ export async function getUserById(id: string): Promise<User | null> {
         name: true,
         email: true,
         role: true,
-      
+        isTwoFactorEnabled: true,
+        isOAuth: true,
       }
     });
-    return user;
+    return user as User;
   } catch (error) {
     console.error("Error fetching user:", error);
     return null;

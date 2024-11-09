@@ -17,8 +17,8 @@ const FavoritesClient: React.FC<FavoritesClientProps> = ({
   return (
     <Container>
       <Heading
-        title="Favorites"
-        subtitle="Your favorite activities"
+        title="Mes favoris"
+        aria-label ="Mes favoris"
       />
       <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {listings.map((listing) => (

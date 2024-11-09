@@ -13,6 +13,23 @@ import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import { Button } from "../ui/button";
 
+// Définition de la fonction newPassword
+async function newPassword(values: { password: string }, token: string | null): Promise<{ error?: string; success?: string }> {
+  // Implémentez la logique ici
+  // Ceci est un exemple, remplacez-le par votre logique réelle
+  try {
+    // Simulons un appel API
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    if (!token) {
+      throw new Error("Token is missing");
+    }
+    // Logique pour changer le mot de passe
+    console.log("Changing password", values.password, token);
+    return { success: "Password changed successfully" };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "Failed to change password" };
+  }
+}
 
 export const NewPasswordForm = () => {
   const searchParams = useSearchParams();
@@ -33,12 +50,17 @@ export const NewPasswordForm = () => {
     setError("");
     setSuccess("");
 
-    startTransition(() => {
-      newPassword(values, token)
-        .then((data) => {
-          setError(data?.error);
-          setSuccess(data?.success);
-        });
+    startTransition(async () => {
+      try {
+        const result = await newPassword(values, token);
+        if (result.error) {
+          setError(result.error);
+        } else if (result.success) {
+          setSuccess(result.success);
+        }
+      } catch (error) {
+        setError("An unexpected error occurred");
+      }
     });
   };
 
@@ -87,7 +109,3 @@ export const NewPasswordForm = () => {
     </CardWrapper>
   );
 };
-
-function newPassword(values: { password: string; }, token: string | null) {
-  throw new Error("Function not implemented.");
-}
