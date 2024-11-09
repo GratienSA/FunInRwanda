@@ -1,48 +1,45 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { buffer } from 'micro';
+import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import prismadb from '@/src/lib/prismadb';
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: '2024-09-30.acacia', 
-  });
+  apiVersion: '2024-09-30.acacia', 
+});
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
-
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
-    const buf = await buffer(req);
-    const sig = req.headers['stripe-signature'] as string;
-
-    let event: Stripe.Event;
-
-    try {
-      event = stripe.webhooks.constructEvent(buf, sig, endpointSecret);
-    } catch (err: any) {
-      console.error(`Webhook Error: ${err.message}`);
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    // Handle the event
-    switch (event.type) {
-      case 'payment_intent.succeeded':
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        await handlePaymentIntentSucceeded(paymentIntent);
-        break;
-      // ... handle other event types
-      default:
-        console.log(`Unhandled event type ${event.type}`);
-    }
-
-    res.json({ received: true });
-  } else {
-    res.setHeader('Allow', 'POST');
-    res.status(405).end('Method Not Allowed');
+export async function POST(req: NextRequest) {
+  if (req.method !== 'POST') {
+    return NextResponse.json({ error: 'Method Not Allowed' }, { status: 405 });
   }
+
+  const buf = await req.text();
+  const sig = req.headers.get('stripe-signature') as string;
+
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(buf, sig, endpointSecret);
+  } catch (err: any) {
+    console.error(`Webhook Error: ${err.message}`);
+    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+  }
+
+  // Handle the event
+  switch (event.type) {
+    case 'payment_intent.succeeded':
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      await handlePaymentIntentSucceeded(paymentIntent);
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  return NextResponse.json({ received: true });
 }
 
 async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {

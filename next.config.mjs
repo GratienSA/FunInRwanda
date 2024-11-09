@@ -28,6 +28,7 @@ const nextConfig = {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
+        crypto: require.resolve('crypto-browserify'),
         fs: false,
         net: false,
         tls: false,
