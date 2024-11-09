@@ -3,6 +3,8 @@ import { buffer } from 'micro';
 import Stripe from 'stripe';
 import prismadb from '@/src/lib/prismadb';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'edge';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2024-09-30.acacia', 
@@ -10,11 +12,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
