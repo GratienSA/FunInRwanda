@@ -1,6 +1,5 @@
 import prismadb from "../lib/prismadb";
 import { SafeUser } from "../types";
-import { UserRole } from "../types"; 
 
 // Fonction pour récupérer tous les utilisateurs
 export async function fetchUsers(): Promise<SafeUser[]> {

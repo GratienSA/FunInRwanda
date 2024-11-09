@@ -8,7 +8,7 @@ import { getUserByEmail, getUserById } from "../data/user"; // Importation de fo
 import { generateVerificationToken } from "../lib/tokens"; // Importation d'une fonction pour générer un token de vérification.
 import { sendVerificationEmail } from "../lib/mail"; // Importation d'une fonction pour envoyer des emails.
 import prismadb from "../lib/prismadb"; // Importation de l'instance Prisma pour interagir avec la base de données.
-import { SafeUser, UserRole } from "../types";
+import { UserRole } from "../types";
 
 export const settings = async ( // Déclaration d'une fonction asynchrone appelée settings.
   values: z.infer<typeof SettingsSchema> // La fonction prend des valeurs qui respectent le schéma SettingsSchema.
