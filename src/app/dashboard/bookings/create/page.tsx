@@ -1,11 +1,11 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
-import getListings, { IListingsParams } from '@/src/actions/getListings';
-import { fetchUsers } from '@/src/actions/user';
-import Breadcrumbs from '@/src/components/bookings/breadcrumbs';
-import BookingForm from '@/src/components/bookings/createForm';
-import { SafeListing, SafeUser } from '@/src/types';
-import Loading from '@/src/app/loading';
+import getListings, { IListingsParams } from '@/actions/getListings';
+import { fetchUsers } from '@/actions/user';
+import Breadcrumbs from '@/components/bookings/breadcrumbs';
+import BookingForm from '@/components/bookings/createForm';
+import { SafeListing, SafeUser } from '@/types';
+import Loading from '@/app/loading';
 
 export const metadata: Metadata = {
   title: 'Create Booking',

@@ -3,7 +3,7 @@
 import React, { useCallback, useMemo } from 'react';
 import Select from 'react-select';
 import useCountryData from '../../hooks/useCountryData';
-import { RegionSelectValue } from '@/src/types';
+import { RegionSelectValue } from '@/types';
 
 interface RegionOption {
   value: string;

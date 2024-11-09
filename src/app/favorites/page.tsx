@@ -1,10 +1,10 @@
 "use client";
 
-import { getFavoriteListings } from "@/src/actions/getFavoriteListings";
-import EmptyState from "@/src/components/EmptyState";
-import ClientOnly from "@/src/components/navbar/ClientOnly";
-import { useCurrentUser } from "@/src/hooks/useCurrentUser";
-import { SafeListing } from "@/src/types";
+import { getFavoriteListings } from "@/actions/getFavoriteListings";
+import EmptyState from "@/components/EmptyState";
+import ClientOnly from "@/components/navbar/ClientOnly";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { SafeListing } from "@/types";
 import { useState, useCallback, useEffect } from "react";
 import toast from "react-hot-toast";
 import FavoritesClient from "./FavoritesClient";

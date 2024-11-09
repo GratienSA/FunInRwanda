@@ -1,5 +1,6 @@
+import prismadb from '@/lib/prismadb';
 import { NextResponse } from 'next/server';
-import prismadb from '@/src/lib/prismadb';
+
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

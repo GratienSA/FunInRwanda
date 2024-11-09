@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js'
 import { toast } from 'react-hot-toast'
-import { currentUser } from '@/src/lib/auth'
+import { currentUser } from '@/lib/auth'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 

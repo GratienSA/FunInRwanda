@@ -2,13 +2,13 @@
 
 import * as z from "zod"; // Importation de la bibliothèque Zod pour la validation des données.
 import bcrypt from "bcrypt"; // Importation de bcrypt pour le hachage des mots de passe.
-import { auth } from "@/auth"; // Importation de la fonction d'authentification.
 import { SettingsSchema } from "../schemas"; // Importation d'un schéma de validation pour les paramètres.
 import { getUserByEmail, getUserById } from "../data/user"; // Importation de fonctions pour récupérer des utilisateurs.
 import { generateVerificationToken } from "../lib/tokens"; // Importation d'une fonction pour générer un token de vérification.
 import { sendVerificationEmail } from "../lib/mail"; // Importation d'une fonction pour envoyer des emails.
 import prismadb from "../lib/prismadb"; // Importation de l'instance Prisma pour interagir avec la base de données.
 import { UserRole } from "../types";
+import { auth } from "auth";
 
 export const settings = async ( // Déclaration d'une fonction asynchrone appelée settings.
   values: z.infer<typeof SettingsSchema> // La fonction prend des valeurs qui respectent le schéma SettingsSchema.

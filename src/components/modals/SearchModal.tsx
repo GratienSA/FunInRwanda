@@ -14,8 +14,8 @@ import Calendar from "../inputs/Calendar";
 import Counter from "../inputs/Counter";
 import RegionSelect from "../inputs/RegionSelect";
 import Input from "../inputs/Input";
-import { RegionSelectValue } from "@/src/types";
-import useSearchModal from "@/src/hooks/useSearchModal";
+import { RegionSelectValue } from "@/types";
+import useSearchModal from "@/hooks/useSearchModal";
 
 enum STEPS {
     LOCATION = 0,

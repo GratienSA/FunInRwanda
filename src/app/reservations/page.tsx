@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { useCurrentUser } from "@/src/hooks/useCurrentUser";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import getBookings from "../../actions/getBookings";
 import EmptyState from "../../components/EmptyState";
 import ClientOnly from "../../components/navbar/ClientOnly";

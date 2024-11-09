@@ -11,7 +11,7 @@ import Input from '../inputs/Input';
 import Counter from '../inputs/Counter';
 import Heading from '../Heading';
 import Select from '../inputs/Select';
-import { BookingFormData } from '@/src/types';
+import { BookingFormData } from '@/types';
 
 interface StepInfoProps {
     register: UseFormRegister<BookingFormData>;

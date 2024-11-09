@@ -4,8 +4,8 @@ import { CalendarIcon, UserCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useFormState } from 'react-dom'
 import { Button } from '../ui/button'
-import { State, updateBooking } from '@/src/actions/getBookings'
-import { ExtendedReceivedBooking, SafeListing, SafeUser } from '@/src/types'
+import { State, updateBooking } from '@/actions/getBookings'
+import { ExtendedReceivedBooking, SafeListing, SafeUser } from '@/types'
 
 interface EditBookingFormProps {
   booking: ExtendedReceivedBooking;

@@ -1,12 +1,12 @@
-import { BookingsTableSkeleton } from '@/src/components/bookings/skeletons'
-import BookingsTable from '@/src/components/bookings/table'
-import { Button } from '@/src/components/ui/button'
+import { BookingsTableSkeleton } from '@/components/bookings/skeletons'
+import BookingsTable from '@/components/bookings/table'
+import { Button } from '@/components/ui/button'
 import { PlusIcon } from 'lucide-react'
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { Suspense } from 'react'
-import { fetchFilteredBookings } from '@/src/actions/getBookings'
-import { ReceivedBooking } from '@/src/types'
+import { fetchFilteredBookings } from '@/actions/getBookings'
+import { ReceivedBooking } from '@/types'
 
 export const metadata: Metadata = {
   title: 'Bookings',

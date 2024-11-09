@@ -1,7 +1,7 @@
 import { PencilIcon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '../ui/button'
-import { deleteBooking } from '@/src/actions/getBookings'
+import { deleteBooking } from '@/actions/getBookings'
 
 export function UpdateBooking({ id }: { id: string }) {
   return (

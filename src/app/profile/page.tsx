@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
-import Avatar from '@/src/components/navbar/Avatar'
+import Avatar from '@/components/navbar/Avatar'
 
 interface UserData {
     name: string

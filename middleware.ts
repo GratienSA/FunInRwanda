@@ -1,11 +1,6 @@
 import NextAuth from "next-auth";
-import authConfig from "@/auth.config";
-import {
-  DEFAULT_LOGIN_REDIRECT,
-  ApiAuthPrefix,
-  authRoutes,
-  publicRoutes,
-} from "@/routes";
+import authConfig from "auth.config";
+import { ApiAuthPrefix, publicRoutes, authRoutes, DEFAULT_LOGIN_REDIRECT } from "routes";
 
 const { auth: middleware } = NextAuth(authConfig);
 

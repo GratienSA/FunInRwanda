@@ -1,9 +1,9 @@
 
-import { Button } from "@/src/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
-import ServerBooking from '@/src/components/bookings/ServerBooking';
+import ServerBooking from '@/components/bookings/ServerBooking';
 
 
 export const metadata: Metadata = {

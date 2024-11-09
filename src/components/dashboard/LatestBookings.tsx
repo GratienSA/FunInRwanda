@@ -1,10 +1,10 @@
 import Image from 'next/image'
 import { RefreshCcw } from 'lucide-react'
-import { cn } from '@/src/lib/utils'
+import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader } from '../ui/card'
-import { fetchLatestBookings } from '@/src/actions/getBookings'
+import { fetchLatestBookings } from '@/actions/getBookings'
 import { useEffect, useState, useMemo, useCallback } from 'react'
-import { SafeBooking, SafeListing, SafeReview, SafeUser } from '@/src/types'
+import { SafeBooking, SafeListing, SafeReview, SafeUser } from '@/types'
 import { Button } from '../ui/button'
 
 function safeToISOString(date: any): string {

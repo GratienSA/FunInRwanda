@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import EmptyState from "../../components/EmptyState";
 import ClientOnly from "../../components/navbar/ClientOnly";
 import ProposalsClient from "./ProposalsClient";
-import { useCurrentUser } from "@/src/hooks/useCurrentUser";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { SafeListing } from "../../types";
 
 const ProposalsPage = () => {

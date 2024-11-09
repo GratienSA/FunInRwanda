@@ -1,4 +1,5 @@
-import FooterSection from '@/src/components/Fragments/FooterSection';
+
+import FooterSection from '@/components/Fragments/FooterSection';
 import React from 'react';
 
 interface ProtectedLayoutProps {

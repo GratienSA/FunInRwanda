@@ -1,4 +1,4 @@
-import spec from '@/swagger';
+import spec from 'swagger';
 import { NextResponse } from 'next/server';
 
 

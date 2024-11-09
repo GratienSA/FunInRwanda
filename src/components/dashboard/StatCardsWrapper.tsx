@@ -1,7 +1,7 @@
 import { BanknoteIcon, ClockIcon, CalendarIcon, UsersIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '../ui/card'
-import { fetchCardData } from '@/src/actions/getBookings'
-import { formatCurrency } from '@/src/types'
+import { fetchCardData } from '@/actions/getBookings'
+import { formatCurrency } from '@/types'
 
 const iconMap = {
   collected: BanknoteIcon,

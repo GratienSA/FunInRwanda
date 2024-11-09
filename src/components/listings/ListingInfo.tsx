@@ -5,8 +5,8 @@ import { IconType } from 'react-icons';
 import Avatar from '../navbar/Avatar';
 import ListingCategory from './ListingCategory';
 import dynamic from 'next/dynamic';
-import { SafeUser } from '@/src/types';
-import useCountryData from '@/src/hooks/useCountryData';
+import { SafeUser } from '@/types';
+import useCountryData from '@/hooks/useCountryData';
 
 // Chargement dynamique du composant Map
 const Map = dynamic(() => import('../Map'), {

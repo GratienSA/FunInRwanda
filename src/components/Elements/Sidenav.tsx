@@ -4,7 +4,7 @@ import Logo from '../navbar/Logo'
 import { PowerIcon } from 'lucide-react'
 import { Button } from '../ui/button'
 import NavLinks from './NavLink'
-import { logout } from '@/src/actions/logout'
+import { logout } from '@/actions/logout'
 
 
 

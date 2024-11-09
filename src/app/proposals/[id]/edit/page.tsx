@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
-import { BookingFormData, SafeListing, SafeUser } from '@/src/types';
-import Container from '@/src/components/Container';
-import ClientOnly from '@/src/components/navbar/ClientOnly';
-import EmptyState from '@/src/components/EmptyState';
-import EditListingForm from '@/src/components/Elements/EditListingForm';
-import Heading from '@/src/components/Heading';
+import { BookingFormData, SafeListing, SafeUser } from '@/types';
+import Container from '@/components/Container';
+import ClientOnly from '@/components/navbar/ClientOnly';
+import EmptyState from '@/components/EmptyState';
+import EditListingForm from '@/components/Elements/EditListingForm';
+import Heading from '@/components/Heading';
 
 interface IParams {
   id: string;

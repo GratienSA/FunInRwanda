@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/src/lib/auth";
-import prismadb from "@/src/lib/prismadb";
+import { currentUser } from "@/lib/auth";
+import prismadb from "@/lib/prismadb";
 import { Prisma } from "@prisma/client";
 
 

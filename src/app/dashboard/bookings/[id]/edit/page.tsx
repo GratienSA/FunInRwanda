@@ -1,11 +1,11 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import Breadcrumbs from '@/src/components/bookings/breadcrumbs'
-import EditBookingForm from '@/src/components/bookings/editForm'
-import getListings, { IListingsParams } from '@/src/actions/getListings'
-import { fetchUsers } from '@/src/actions/user'
-import { fetchBookingById } from '@/src/actions/getBookings'
-import { FormattedBooking, SafeBooking, ExtendedReceivedBooking } from '@/src/types'
+import Breadcrumbs from '@/components/bookings/breadcrumbs'
+import EditBookingForm from '@/components/bookings/editForm'
+import getListings, { IListingsParams } from '@/actions/getListings'
+import { fetchUsers } from '@/actions/user'
+import { fetchBookingById } from '@/actions/getBookings'
+import { FormattedBooking, SafeBooking, ExtendedReceivedBooking } from '@/types'
 
 export const metadata: Metadata = {
   title: 'Edit Booking',

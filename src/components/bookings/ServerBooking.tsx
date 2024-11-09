@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
-import BookingsTable from "@/src/components/bookings/table";
-import { fetchFilteredBookings } from "@/src/actions/getBookings";
-import { ReceivedBooking as ImportedReceivedBooking } from '@/src/types';
+import BookingsTable from "@/components/bookings/table";
+import { fetchFilteredBookings } from "@/actions/getBookings";
+import { ReceivedBooking as ImportedReceivedBooking } from '@/types';
 
 // Utilisez un type mapping pour rendre tous les champs de user et listing requis
 type RequiredFields<T> = {
@@ -19,18 +19,18 @@ async function ServerComponent({ query, currentPage }: { query: string, currentP
   const bookingsData = await fetchFilteredBookings(query, currentPage);
   
   const filteredBookings: LocalReceivedBooking[] = bookingsData
-    .filter((booking): booking is NonNullable<typeof booking> => booking !== null)
-    .map((booking) => ({
-      ...booking,
-      user: Object.fromEntries(
-        Object.entries(booking.user).map(([key, value]) => [key, value ?? undefined])
-      ) as RequiredFields<ImportedReceivedBooking['user']>,
-      startDate: booking.startDate instanceof Date ? booking.startDate : new Date(booking.startDate),
-      endDate: booking.endDate instanceof Date ? booking.endDate : new Date(booking.endDate),
-      listing: Object.fromEntries(
-        Object.entries(booking.listing).map(([key, value]) => [key, value ?? undefined])
-      ) as RequiredFields<ImportedReceivedBooking['listing']>,
-    }));
+  .filter((booking): booking is NonNullable<typeof booking> => booking !== null)
+  .map((booking) => ({
+    ...booking,
+    user: Object.fromEntries(
+      Object.entries(booking.user).map(([key, value]) => [key, value ?? undefined])
+    ) as RequiredFields<ImportedReceivedBooking['user']>,
+    startDate: booking.startDate instanceof Date ? booking.startDate : new Date(booking.startDate),
+    endDate: booking.endDate instanceof Date ? booking.endDate : new Date(booking.endDate),
+    listing: Object.fromEntries(
+      Object.entries(booking.listing).map(([key, value]) => [key, value ?? undefined])
+    ) as RequiredFields<ImportedReceivedBooking['listing']>,
+  }));
   
   return (
     <Suspense fallback={<div>Chargement des réservations...</div>}>

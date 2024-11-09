@@ -212,7 +212,7 @@ export type ReceivedBooking = {
   createdAt: Date;
   updatedAt: Date;
   status: string;
-  paymentIntentId: string | null;
+  paymentIntentId?: string | null;
   user: {
     id: string | undefined;
     name: string | null;

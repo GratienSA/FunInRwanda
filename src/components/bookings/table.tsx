@@ -1,9 +1,9 @@
-"use client"
+"use client"; 
 
-import Image from 'next/image'
-import { DeleteBooking, UpdateBooking } from './buttons'
-import BookingStatus from './status'
-import { formatCurrency, formatDateToLocal, ReceivedBooking } from '@/src/types'
+import Image from 'next/image';
+import { DeleteBooking, UpdateBooking } from './buttons';
+import BookingStatus from './status';
+import { formatCurrency, formatDateToLocal, ReceivedBooking } from '@/types';
 
 export default function BookingsTable({
   bookings,
@@ -12,11 +12,11 @@ export default function BookingsTable({
   isLoading,
   error,
 }: {
-  bookings?: ReceivedBooking[]
-  query?: string
-  currentPage?: number
-  isLoading: boolean
-  error?: string
+  bookings?: ReceivedBooking[];
+  query?: string;
+  currentPage?: number;
+  isLoading: boolean;
+  error?: string;
 }) {
   if (isLoading) {
     return <div>Loading bookings...</div>;
@@ -30,13 +30,13 @@ export default function BookingsTable({
     return <div>No bookings found.</div>;
   }
 
-
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-lg p-2 md:pt-0">
+          {/* Mobile View */}
           <div className="md:hidden">
-            {bookings?.map((booking) => (
+            {bookings.map((booking) => (
               <div key={booking.id} className="mb-2 w-full rounded-md p-4">
                 <div className="flex items-center justify-between border-b pb-4">
                   <div>
@@ -73,37 +73,24 @@ export default function BookingsTable({
             ))}
           </div>
 
+          {/* Desktop View */}
           <table className="hidden min-w-full md:table">
             <thead className="rounded-lg text-left text-sm font-normal">
               <tr>
-                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">
-                  Customer
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Email
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Listing
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Check-in
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Check-out
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Total
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Status
-                </th>
+                <th scope="col" className="px-4 py-5 font-medium sm:pl-6">Customer</th>
+                <th scope="col" className="px-3 py-5 font-medium">Email</th>
+                <th scope="col" className="px-3 py-5 font-medium">Listing</th>
+                <th scope="col" className="px-3 py-5 font-medium">Check-in</th>
+                <th scope="col" className="px-3 py-5 font-medium">Check-out</th>
+                <th scope="col" className="px-3 py-5 font-medium">Total</th>
+                <th scope="col" className="px-3 py-5 font-medium">Status</th>
                 <th scope="col" className="relative py-3 pl-6 pr-3">
                   <span className="sr-only">Actions</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {bookings?.map((booking) => (
+              {bookings.map((booking) => (
                 <tr
                   key={booking.id}
                   className="w-full border-b py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
@@ -120,24 +107,12 @@ export default function BookingsTable({
                       <p>{booking.user.name}</p>
                     </div>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {booking.user.email}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {booking.listing.title}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {formatDateToLocal(booking.startDate?.toISOString())}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {formatDateToLocal(booking.endDate?.toISOString())}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    {formatCurrency(booking.totalPrice)}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3">
-                    <BookingStatus status={booking.status} />
-                  </td>
+                  <td className="whitespace-nowrap px-3 py-3">{booking.user.email}</td>
+                  <td className="whitespace-nowrap px-3 py-3">{booking.listing.title}</td>
+                  <td className="whitespace-nowrap px-3 py-3">{formatDateToLocal(booking.startDate?.toISOString())}</td>
+                  <td className="whitespace-nowrap px-3 py-3">{formatDateToLocal(booking.endDate?.toISOString())}</td>
+                  <td className="whitespace-nowrap px-3 py-3">{formatCurrency(booking.totalPrice)}</td>
+                  <td className="whitespace-nowrap px-3 py-3"><BookingStatus status={booking.status} /></td>
                   <td className="whitespace-nowrap py-3 pl-6 pr-3">
                     <div className="flex justify-end gap-3">
                       <UpdateBooking id={booking.id} />
@@ -151,5 +126,5 @@ export default function BookingsTable({
         </div>
       </div>
     </div>
-  )
+  );
 }

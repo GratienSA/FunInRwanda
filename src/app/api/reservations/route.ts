@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@/src/lib/auth";
-import prismadb from "@/src/lib/prismadb";
+import { currentUser } from "@/lib/auth";
+import prismadb from "@/lib/prismadb";
 
 export async function POST(req: Request) {
   const user = await currentUser();

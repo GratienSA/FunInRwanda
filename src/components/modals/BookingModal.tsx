@@ -11,8 +11,8 @@ import StepInfo from '../steps/StepInfo'
 import StepImages from '../steps/StepImages'
 import StepDescription from '../steps/StepDescription'
 import StepPrice from '../steps/StepPrice'
-import useBookingModal from '@/src/hooks/useBookingModal'
-import { BookingFormData } from '@/src/types'
+import useBookingModal from '@/hooks/useBookingModal'
+import { BookingFormData } from '@/types'
 
 enum STEPS {
     CATEGORY = 0,

@@ -1,4 +1,4 @@
-import { SafeListing } from '@/src/types';
+import { SafeListing } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaStar } from 'react-icons/fa';

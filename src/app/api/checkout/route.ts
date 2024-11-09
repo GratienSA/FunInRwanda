@@ -1,4 +1,5 @@
-import prismadb from '@/src/lib/prismadb';
+
+import prismadb from '@/lib/prismadb';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 

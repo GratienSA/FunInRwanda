@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import SearchFilters from '@/src/components/search/SearchFilters';
-import SearchResults from '@/src/components/search/SearchResults';
-import Search from '@/src/components/navbar/Search';
+import SearchFilters from '@/components/search/SearchFilters';
+import SearchResults from '@/components/search/SearchResults';
+import Search from '@/components/navbar/Search';
 
 export default function SearchPage() {
   // États pour gérer les résultats de recherche, le chargement, les erreurs et le total des résultats

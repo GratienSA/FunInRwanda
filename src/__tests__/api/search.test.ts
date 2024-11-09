@@ -1,6 +1,7 @@
+import prismadb from '@/lib/prismadb';
+import { GET } from 'auth';
 import { NextRequest, NextResponse } from 'next/server';
-import { GET } from '@/src/app/api/search/route';
-import prismadb from '@/src/lib/prismadb';
+
 
 // Mock de prismadb
 jest.mock('@/src/lib/prismadb', () => ({

@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import Heading from '../Heading';
 import Input from '../inputs/Input';
 import RegionSelect from '../inputs/RegionSelect';
-import { BookingFormData } from '@/src/types';
+import { BookingFormData } from '@/types';
 
 // Définition du type RegionSelectValue
 export type RegionSelectValue = {

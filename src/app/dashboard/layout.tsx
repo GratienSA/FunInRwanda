@@ -1,5 +1,5 @@
-import AdminProtectedRoute from "@/src/components/dashboard/ProtectedRoute";
-import SideNav from "@/src/components/Elements/Sidenav";
+import AdminProtectedRoute from "@/components/dashboard/ProtectedRoute";
+import SideNav from "@/components/Elements/Sidenav";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@/auth"
+import { auth } from 'auth';
 import prismadb from '../lib/prismadb';
 import { SafeListing, SafeUser, SafeBooking, SafeReview } from '../types'; // Assurez-vous d'importer les types nécessaires
 

@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react';
 import { useForm } from "react-hook-form";
 import Heading from "../Heading";
-import { BookingFormData } from '@/src/types'; 
+import { BookingFormData } from '@/types'; 
 import Image from 'next/image';
 
 interface StepImagesProps {

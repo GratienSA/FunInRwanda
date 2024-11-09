@@ -1,9 +1,8 @@
 "use client"
-
-import LatestBookings from '@/src/components/dashboard/LatestBookings'
-import RevenueChartWrapper from '@/src/components/dashboard/RevenueChartWrapper'
-import StatCardsWrapper from '@/src/components/dashboard/StatCardsWrapper'
-import { CardsSkeleton, LatestBookingsSkeleton, RevenueChartSkeleton } from '@/src/components/Elements/skeletons'
+import LatestBookings from '@/components/dashboard/LatestBookings'
+import RevenueChartWrapper from '@/components/dashboard/RevenueChartWrapper'
+import StatCardsWrapper from '@/components/dashboard/StatCardsWrapper'
+import { CardsSkeleton, LatestBookingsSkeleton, RevenueChartSkeleton } from '@/components/Elements/skeletons'
 import { Suspense } from 'react'
 
 export default function Page() {

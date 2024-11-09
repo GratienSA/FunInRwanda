@@ -5,8 +5,8 @@ import { ExitIcon } from "@radix-ui/react-icons"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { LogoutButton } from "./logout-button";
-import { useCurrentUser } from "@/src/hooks/useCurrentUser";
-import { SafeUser } from "@/src/types"; // Assurez-vous que ce chemin d'importation est correct
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { SafeUser } from "@/types"; // Assurez-vous que ce chemin d'importation est correct
 
 export const UserButton = () => {
   const { user, isLoading } = useCurrentUser();

@@ -1,11 +1,11 @@
 "use client"
 
-import getBookings from "@/src/actions/getBookings";
-import getListingById from "@/src/actions/getListingById";
-import EmptyState from "@/src/components/EmptyState";
-import ClientOnly from "@/src/components/navbar/ClientOnly";
+import getBookings from "@/actions/getBookings";
+import getListingById from "@/actions/getListingById";
+import EmptyState from "@/components/EmptyState";
+import ClientOnly from "@/components/navbar/ClientOnly";
 import ListingClient from "./[listingId]/ListingClient";
-import { useCurrentUser } from "@/src/hooks/useCurrentUser";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 interface IParams {
   listingId?: string;

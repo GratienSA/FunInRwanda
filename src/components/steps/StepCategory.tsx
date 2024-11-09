@@ -1,6 +1,6 @@
 "use client";
 
-import { BookingFormData } from "@/src/types";
+import { BookingFormData } from "@/types";
 import Heading from "../Heading";
 import CategoryInput from "../inputs/CategoryInput";
 import { categories } from "../navbar/Categories";

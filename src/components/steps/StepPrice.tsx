@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { FieldErrors, UseFormRegister, UseFormWatch } from "react-hook-form";
 import Input from "../inputs/Input";
 import Heading from "../Heading";
-import { BookingFormData } from '@/src/types';
+import { BookingFormData } from '@/types';
 
 interface StepPriceProps {
   register: UseFormRegister<BookingFormData>;

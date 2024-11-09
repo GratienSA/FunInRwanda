@@ -7,7 +7,6 @@ interface CheckoutData {
   currency: string;
   description: string;
   bookingId: string;
-  orderId: string;
 }
 
 export async function checkoutAction(data: CheckoutData) {
@@ -30,11 +29,7 @@ export async function checkoutAction(data: CheckoutData) {
           status: 'succeeded',
           stripePaymentIntentId: paymentIntent.id,
           bookingId: data.bookingId,
-          order: {
-            connect: {
-              id: data.orderId
-            }
-          }
+      
         },
       });
 

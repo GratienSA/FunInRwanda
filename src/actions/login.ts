@@ -2,7 +2,6 @@
 
 import * as z from 'zod';
 import { AuthError } from 'next-auth';
-import { signIn } from '@/auth';
 import prismadb from '../lib/prismadb';
 import { LoginSchema } from '../schemas';
 import { getUserByEmail } from '../data/user';
@@ -10,7 +9,9 @@ import { generateTwoFactorToken, generateVerificationToken } from '../lib/tokens
 import { sendTwoFactorTokenEmail, sendVerificationEmail } from '../lib/mail';
 import { getTwoFactorTokenByEmail } from '../data/two-factor-token';
 import { getTwoFactorConfirmationByUserId } from '../data/two-factor-confirmation';
-import { DEFAULT_LOGIN_REDIRECT } from '@/routes';
+import { DEFAULT_LOGIN_REDIRECT } from 'routes';
+import { signIn } from 'auth';
+
 
 export const login = async (
     values: z.infer<typeof LoginSchema>,

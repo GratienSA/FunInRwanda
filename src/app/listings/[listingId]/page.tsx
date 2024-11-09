@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useCurrentUser } from "@/src/hooks/useCurrentUser";
-import getBookings from "@/src/actions/getBookings";
-import getListingById from "@/src/actions/getListingById";
-import EmptyState from "@/src/components/EmptyState";
-import ClientOnly from "@/src/components/navbar/ClientOnly";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import getBookings from "@/actions/getBookings";
+import getListingById from "@/actions/getListingById";
+import EmptyState from "@/components/EmptyState";
+import ClientOnly from "@/components/navbar/ClientOnly";
 import ListingClient from "./ListingClient";
-import { SafeListing, SafeBooking } from "@/src/types"; 
+import { SafeListing, SafeBooking } from "@/types"; 
 
 // Définition de l'interface pour les paramètres
 interface IParams {

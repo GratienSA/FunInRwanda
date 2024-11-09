@@ -5,7 +5,7 @@ import Image from "next/image";
 import Heading from "../Heading";
 import HeartButton from "../HeartButton";
 import { SafeUser } from "../../types";
-import useCountryData from "@/src/hooks/useCountryData";
+import useCountryData from "@/hooks/useCountryData";
 
 interface ListingHeadProps {
     title: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCurrentRole } from "@/src/hooks/useCurrentRole";
+import { useCurrentRole } from "@/hooks/useCurrentRole";
 import { useRouter } from "next/navigation"; 
 import { useEffect, useState } from "react";
 

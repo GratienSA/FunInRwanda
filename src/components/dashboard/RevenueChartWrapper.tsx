@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import RevenueChart from './RevenueChart';
 import { Card, CardContent, CardHeader } from '../ui/card';
-import { fetchCardData } from '@/src/actions/getBookings';
+import { fetchCardData } from '@/actions/getBookings';
 
 type RevenueData = {
   month: string;

@@ -1,4 +1,4 @@
-import { FormattedCustomersTable } from '@/src/types';
+import { FormattedCustomersTable } from '@/types';
 import Image from 'next/image';
 
 export default function CustomersTable({ customers }: { customers: FormattedCustomersTable[] }) {

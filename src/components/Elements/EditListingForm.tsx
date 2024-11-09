@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo } from 'react'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { toast } from 'react-hot-toast'
-import { SafeListing, BookingFormData } from '@/src/types'
+import { SafeListing, BookingFormData } from '@/types'
 import StepCategory from '../steps/StepCategory'
 import StepLocation from '../steps/StepLocation'
 import StepInfo from '../steps/StepInfo'

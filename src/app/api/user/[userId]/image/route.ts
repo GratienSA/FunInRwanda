@@ -1,4 +1,4 @@
-import prismadb from '@/src/lib/prismadb';
+import prismadb from '@/lib/prismadb';
 import { NextRequest, NextResponse } from 'next/server';
 
 

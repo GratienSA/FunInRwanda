@@ -3,8 +3,8 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import Image from 'next/image';
 import { useDispatch } from 'react-redux';
-import { setShowModal } from '@/src/app/redux/slice/showModalSlice';
-import { SafeListing } from '@/src/types';
+import { SafeListing } from '@/types';
+import { setShowModal } from '@/app/redux/slice/showModalSlice';
 
 // Définition des props du composant
 interface ModalDetailListingProps {
