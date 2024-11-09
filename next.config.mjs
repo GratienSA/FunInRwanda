@@ -1,3 +1,12 @@
+import path from 'path'; // Import the path module
+import { fileURLToPath } from 'url'; // Import to handle __dirname
+import { createRequire } from 'module'; // Import createRequire to use require in ES modules
+
+// Define __filename and __dirname for use in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const require = createRequire(import.meta.url); // Create a require function for ES modules
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
@@ -25,6 +34,7 @@ const nextConfig = {
   },
   webpack: (config, { isServer }) => {
     config.resolve.alias['@'] = path.resolve(__dirname, './');
+
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -32,7 +42,6 @@ const nextConfig = {
         fs: false,
         net: false,
         tls: false,
-        crypto: false,
         child_process: false,
         'mock-aws-s3': false,
         'aws-sdk': false,
