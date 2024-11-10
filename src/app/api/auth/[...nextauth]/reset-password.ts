@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 import { ManagementClient } from 'auth0';
 
 const auth0 = new ManagementClient({
@@ -7,15 +7,11 @@ const auth0 = new ManagementClient({
   clientSecret: process.env.AUTH0_CLIENT_SECRET!,
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const { email } = req.body;
+export async function POST(request: Request) {
+  const { email } = await request.json();
 
   if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+    return NextResponse.json({ error: 'Email is required' }, { status: 400 });
   }
 
   try {
@@ -25,9 +21,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       result_url: `${process.env.AUTH0_BASE_URL}/login`,
     });
 
-    return res.status(200).json({ message: 'Password reset email sent successfully' });
+    return NextResponse.json({ message: 'Password reset email sent successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error sending password reset email:', error);
-    return res.status(500).json({ error: 'Failed to send password reset email' });
+    return NextResponse.json({ error: 'Failed to send password reset email' }, { status: 500 });
   }
 }
