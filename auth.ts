@@ -1,10 +1,10 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import prismadb from "./src/lib/prismadb";
-import { getUserById } from "./src/data/user";
-import { getAccountByUserId } from "./src/data/account";
+import prismadb from "@/lib/prismadb";
+import { getUserById } from "@/data/user";
+import { getAccountByUserId } from "@/data/account";
 import { UserRole } from "@/types";
-import authConfig from "auth.config";
+import authConfig from "./auth.config";
 
 export const {
   handlers: { GET, POST },
@@ -19,14 +19,10 @@ export const {
   events: {
     async linkAccount({ user }) {
       if (user.id) {
-        try {
-          await prismadb.user.update({
-            where: { id: user.id },
-            data: { emailVerified: new Date() }
-          });
-        } catch (error) {
-          console.error("Error in linkAccount event:", error);
-        }
+        await prismadb.user.update({
+          where: { id: user.id },
+          data: { emailVerified: new Date() }
+        });
       }
     }
   },
@@ -35,23 +31,16 @@ export const {
       if (account?.provider !== "credentials") return true;
 
       if (user.id) {
-        try {
-          const existingUser = await getUserById(user.id);
+        const existingUser = await getUserById(user.id);
 
-          if (!existingUser?.emailVerified) {
-            console.log(`Tentative de connexion avec un email non vérifié: ${user.email}`);
-            return false;
-          }
-
-          return true; // Authentification réussie
-        } catch (error) {
-          console.error("Error in signIn callback:", error);
+        if (!existingUser?.emailVerified) {
           return false;
         }
+
+        return true;
       }
       return false;
     },
-
     async session({ token, session }) {
       if (session.user) {
         session.user.id = token.sub as string;
@@ -66,32 +55,26 @@ export const {
       }
       return session;
     },
-
     async jwt({ token }) {
       if (!token.sub) return token;
 
-      try {
-        const existingUser = await getUserById(token.sub);
+      const existingUser = await getUserById(token.sub);
 
-        if (!existingUser) return token;
+      if (!existingUser) return token;
 
-        const existingAccount = await getAccountByUserId(existingUser.id);
+      const existingAccount = await getAccountByUserId(existingUser.id);
 
-        return {
-          ...token,
-          isOAuth: !!existingAccount,
-          name: existingUser.name,
-          email: existingUser.email,
-          role: existingUser.role, 
-          favoriteIds: existingUser.favoriteIds,
-          emailVerified: existingUser.emailVerified 
-            ? existingUser.emailVerified.toISOString()
-            : null,
-        };
-      } catch (error) {
-        console.error("Error in jwt callback:", error);
-        return token;
-      }
+      return {
+        ...token,
+        isOAuth: !!existingAccount,
+        name: existingUser.name,
+        email: existingUser.email,
+        role: existingUser.role, 
+        favoriteIds: existingUser.favoriteIds,
+        emailVerified: existingUser.emailVerified 
+          ? existingUser.emailVerified.toISOString()
+          : null,
+      };
     },
   },
   adapter: PrismaAdapter(prismadb),
