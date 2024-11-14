@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
 import { useState } from 'react';
-import { usePathname, useSearchParams, useRouter } from "next/navigation"
-import { FaGift, FaBirthdayCake, FaGlassCheers, FaBuilding } from 'react-icons/fa'
-import { GiPartyPopper } from 'react-icons/gi'
-import CategoryBox from "../CategoryBox"
-import Container from "../Container"
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { FaGift, FaBirthdayCake, FaGlassCheers, FaBuilding } from 'react-icons/fa';
+import { GiPartyPopper } from 'react-icons/gi';
+import CategoryBox from "../CategoryBox";
+import Container from "../Container";
+import { Route } from 'next';
 
 // Définition de l'interface Filtres
 interface Filtres {
-  categorie: string;
-  // Ajoutez d'autres propriétés si nécessaire
+    categorie: string;
 }
 
 // Définition des catégories avec leurs icônes et descriptions
@@ -40,7 +40,7 @@ export const categories = [
         icon: FaBuilding,
         description: "Événements d'entreprise et team building"
     }
-]
+];
 
 const Categories = () => {
     const router = useRouter();
@@ -55,10 +55,13 @@ const Categories = () => {
 
     const gererChangementFiltre = (cle: keyof Filtres, valeur: string) => {
         setFiltres(prev => ({ ...prev, [cle]: valeur }));
+        
         // Mise à jour de l'URL
         const paramsRecherche = new URLSearchParams(params);
         paramsRecherche.set(cle, valeur);
-        router.push(`${pathname}?${paramsRecherche.toString()}`);
+
+        // Utilisation d'un cast pour forcer le type
+        router.push(`${pathname}?${paramsRecherche.toString()}` as unknown as Route); 
     };
 
     // Ne rendre les catégories que sur la page principale
@@ -68,7 +71,6 @@ const Categories = () => {
 
     return (
         <Container>
-            {/* Conteneur principal avec gestion du défilement horizontal sur petits écrans */}
             <nav className="py-4 md:py-8" aria-label="Navigation par catégorie">
                 <ul className="flex flex-row items-center justify-start md:justify-between overflow-x-auto space-x-4 md:space-x-8">
                     {categories.map((item) => (
@@ -85,7 +87,7 @@ const Categories = () => {
                 </ul>
             </nav>
         </Container>
-    )
-}
+    );
+};
 
-export default Categories
+export default Categories;

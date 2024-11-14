@@ -16,6 +16,7 @@ import RegionSelect from "../inputs/RegionSelect";
 import Input from "../inputs/Input";
 import { RegionSelectValue } from "@/types";
 import useSearchModal from "@/hooks/useSearchModal";
+import { Route } from "next";
 
 enum STEPS {
     LOCATION = 0,
@@ -106,7 +107,7 @@ const SearchModal = () => {
     
         setStep(STEPS.LOCATION);
         searchModal.onClose();
-        router.push(url);
+        router.push(url as unknown as Route);
     });
     
 

@@ -10,6 +10,7 @@ import ClientOnly from '@/components/navbar/ClientOnly';
 import EmptyState from '@/components/EmptyState';
 import EditListingForm from '@/components/Elements/EditListingForm';
 import Heading from '@/components/Heading';
+import { Route } from 'next';
 
 interface IParams {
   id: string;
@@ -60,7 +61,7 @@ const EditProposalPage = ({ params }: { params: IParams }) => {
           'aria-live': 'polite',
         },
       });
-      router.push(`/proposals/${params.id}`);
+      router.push(`/proposals/${params.id}` as unknown as Route);;
     } catch (error) {
       toast.error("Erreur lors de la mise à jour de l'annonce", {
         ariaProps: {

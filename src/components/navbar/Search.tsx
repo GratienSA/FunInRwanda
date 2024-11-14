@@ -1,5 +1,6 @@
 'use client'
 
+import { Route } from 'next'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { BiSearch } from 'react-icons/bi'
@@ -27,7 +28,7 @@ const Search = () => {
         else query.delete('q')
 
         const searchUrl = `/search?${query.toString()}`
-        router.push(searchUrl)
+        router.push(searchUrl as unknown as Route)
     }
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {

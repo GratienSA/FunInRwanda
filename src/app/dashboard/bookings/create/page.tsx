@@ -1,26 +1,19 @@
-import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { Metadata } from 'next';
 import getListings, { IListingsParams } from '@/actions/getListings';
 import { fetchUsers } from '@/actions/user';
 import Breadcrumbs from '@/components/bookings/breadcrumbs';
-import BookingForm from '@/components/bookings/createForm';
-import { SafeListing, SafeUser } from '@/types';
 import Loading from '@/app/loading';
 
 export const metadata: Metadata = {
   title: 'Create Booking',
 };
 
-type BookingFormProps = {
-  users: SafeUser[];
-  listings: SafeListing[];
-};
-
-const BookingFormWrapper: React.FC<BookingFormProps> = ({ users, listings }) => (
-  <Suspense fallback={<Loading />}>
-    <BookingForm users={users} listings={listings} />
-  </Suspense>
-);
+// Dynamically import BookingFormWrapper without SSR
+const BookingFormWrapper = dynamic(() => import('@/components/bookings/BookingFormWrapper'), {
+  ssr: false,
+  loading: () => <Loading />,
+});
 
 export default async function CreateBookingPage() {
   const listingsParams: IListingsParams = {
@@ -29,17 +22,25 @@ export default async function CreateBookingPage() {
   };
 
   try {
+    // Fetch users and listings concurrently
     const [users, listingsData] = await Promise.all([
       fetchUsers(),
       getListings(listingsParams),
     ]);
 
+    // Destructure listings and totalCount from listingsData
     const { listings, totalCount } = listingsData;
 
-    if (listings.length === 0) {
+    // Validate fetched data
+    if (!Array.isArray(listings) || listings.length === 0) {
       return <div>No listings available. Please create some listings first.</div>;
     }
 
+    if (!Array.isArray(users) || users.length === 0) {
+      return <div>No users available. Please try again later.</div>;
+    }
+
+    // Render the main content
     return (
       <main>
         <Breadcrumbs
@@ -58,6 +59,8 @@ export default async function CreateBookingPage() {
     );
   } catch (error) {
     console.error('Error fetching data:', error);
+    
+    // Provide a user-friendly error message
     return <div>An error occurred while loading the data. Please try again later.</div>;
   }
 }

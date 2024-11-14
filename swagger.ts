@@ -1,4 +1,4 @@
-// lib/swagger.ts
+
 import { createSwaggerSpec } from 'next-swagger-doc'
 
 const apiDocumentation = {

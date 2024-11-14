@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { Route } from 'next';
 
 const FooterSection: React.FC = () => {
     const [isMounted, setIsMounted] = useState(false);
     const router = useRouter();
- 
 
     useEffect(() => {
         setIsMounted(true);
@@ -68,8 +68,8 @@ const FooterSection: React.FC = () => {
                     <div>
                         <h2 className='font-semibold text-lg mb-4 text-center sm:text-left'>Liens rapides</h2>
                         <ul className='flex flex-col items-center sm:items-start gap-2'>
-                            <li><button onClick={() => router.push("/destinations")} className='text-gray-600 dark:text-gray-400 hover:text-primaryred dark:hover:text-primaryyellow transition-colors'>Destinations</button></li>
-                            <li><button onClick={() => router.push("/promos")} className='text-gray-600 dark:text-gray-400 hover:text-primaryred dark:hover:text-primaryyellow transition-colors'>Promos</button></li>
+                            <li><button onClick={() => router.push("/destinations" as unknown as Route)} className='text-gray-600 dark:text-gray-400 hover:text-primaryred dark:hover:text-primaryyellow transition-colors'>Destinations</button></li>
+                            <li><button onClick={() => router.push("/promos" as unknown as Route)} className='text-gray-600 dark:text-gray-400 hover:text-primaryred dark:hover:text-primaryyellow transition-colors'>Promos</button></li>
                         </ul>
                     </div>
                 </div>

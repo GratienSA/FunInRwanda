@@ -1,11 +1,10 @@
-import path from 'path'; // Import the path module
-import { fileURLToPath } from 'url'; // Import to handle __dirname
-import { createRequire } from 'module'; // Import createRequire to use require in ES modules
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
-// Define __filename and __dirname for use in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const require = createRequire(import.meta.url); // Create a require function for ES modules
+const require = createRequire(import.meta.url);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -18,6 +17,8 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ['cloudinary'],
+    typedRoutes: true,
+    excludeDefaultMomentLocales: true,
   },
   images: {
     remotePatterns: [

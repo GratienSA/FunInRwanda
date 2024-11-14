@@ -13,6 +13,7 @@ import { Provider } from 'react-redux';
 import store from "./redux/store"; 
 import { useEffect, useState } from "react";
 import AuthModals from "../components/modals/AuthModals";
+import 'swagger-ui-react/swagger-ui.css'
 
 const font = Nunito({ 
   subsets: ["latin"],

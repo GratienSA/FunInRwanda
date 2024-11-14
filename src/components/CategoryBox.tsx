@@ -1,7 +1,10 @@
+"use client";
+
 import { IconType } from "react-icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import qs from "query-string";
+import { Route } from "next";
 
 // Définition des props du composant
 interface CategoryBoxProps {
@@ -9,14 +12,15 @@ interface CategoryBoxProps {
     label: string;
     selected?: boolean;
     description: string; 
-    onClick: () => void;
+    onClick: () => void; 
 }
 
 const CategoryBox: React.FC<CategoryBoxProps> = ({
     icon: Icon,
     label,
     selected,
-    description
+    description,
+    onClick
 }) => {
     const router = useRouter();
     const params = useSearchParams();
@@ -30,10 +34,10 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
         }
 
         // Mise à jour de la requête
-        const updatedQuery: any = {
+        const updatedQuery: Record<string, any> = {
             ...currentQuery,
             category: label
-        }
+        };
 
         // Suppression de la catégorie si elle est déjà sélectionnée
         if (params?.get('category') === label) {
@@ -47,7 +51,7 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
         }, { skipNull: true });
 
         // Navigation vers la nouvelle URL
-        router.push(url);
+        router.push(url as unknown as Route); // Pas besoin de cast ici, car url est une chaîne valide
     }, [label, params, router]);
 
     return (
@@ -78,6 +82,6 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
             </div>
         </button>
     );
-}
+};
 
 export default CategoryBox;

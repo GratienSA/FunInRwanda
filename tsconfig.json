@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -14,11 +18,16 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".",  // This can stay as is
-    "types": ["jest", "node"],
+    "baseUrl": ".", // This can stay as is
+    "types": [
+      "jest",
+      "node"
+    ],
     // Adjusting paths to target the src directory
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     },
     "plugins": [
       {
@@ -34,11 +43,14 @@
     ".next/types/**/*.ts",
     "middleware.ts",
     // Ensure this includes all necessary src directories
-    "src/**/*", 
+    "src/**/*",
     // You can keep specific paths if needed
     "cloudinary.d.ts",
-    "src/__tests__/api"
+    "src/__tests__/api",
+    "out/types/**/*.ts"
   ],
   // Exclude node_modules as before
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

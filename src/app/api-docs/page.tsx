@@ -1,11 +1,11 @@
+import ApiDocsWrapper from '@/components/ApiDocsWrapper'
+import 'swagger-ui-react/swagger-ui.css'
 
-import { swaggerSpec } from 'swagger';
-import SwaggerUI from 'swagger-ui-react';
-import 'swagger-ui-react/swagger-ui.css';
-
-
-const ApiDocs = () => {
-  return <SwaggerUI spec={swaggerSpec} />;
-};
-
-export default ApiDocs;
+export default function ApiDocsPage() {
+  return (
+    <div>
+      <h1>API Documentation</h1>
+      <ApiDocsWrapper />
+    </div>
+  )
+}

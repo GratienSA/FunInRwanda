@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { Route } from "next";
 
 
 interface BackButtonProps {
@@ -20,9 +21,9 @@ export const BackButton = ({
       size="sm"
       asChild
     >
-      <Link href={href}>
-        {label}
-      </Link>
+      <Link href={href as unknown as Route}>
+  {label}
+</Link>
     </Button>
   );
 };
