@@ -11,8 +11,8 @@ interface CategoryBoxProps {
     icon: IconType;
     label: string;
     selected?: boolean;
-    description: string; 
-    onClick: () => void; 
+    description: string;
+    onClick: () => void;
 }
 
 const CategoryBox: React.FC<CategoryBoxProps> = ({
@@ -25,7 +25,6 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
     const router = useRouter();
     const params = useSearchParams();
 
-    // Gestion du clic sur la catégorie
     const handleClick = useCallback(() => {
         let currentQuery = {};
 
@@ -50,8 +49,8 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
             query: updatedQuery
         }, { skipNull: true });
 
-        // Navigation vers la nouvelle URL
-        router.push(url as unknown as Route); // Pas besoin de cast ici, car url est une chaîne valide
+        // Utilisation de `router.push` seulement après un clic
+        router.push(url as unknown as Route)
     }, [label, params, router]);
 
     return (
@@ -63,13 +62,13 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
                 items-center 
                 justify-center 
                 gap-2
-                p-2 sm:p-3 md:p-4 // Padding responsive
+                p-2 sm:p-3 md:p-4 
                 border-b-2
                 hover:text-neutral-800
                 transition
                 cursor-pointer
                 rounded-xl
-                w-full sm:w-auto // Largeur responsive
+                w-full sm:w-auto 
                 ${selected ? 'border-b-neutral-800 text-neutral-800' : 'border-transparent text-neutral-500'}
                 ${selected ? 'bg-neutral-100' : 'hover:bg-neutral-100'}
             `}
