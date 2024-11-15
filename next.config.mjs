@@ -18,7 +18,7 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['cloudinary'],
     typedRoutes: true,
-    // excludeDefaultMomentLocales: true,
+    
   },
   images: {
     remotePatterns: [
